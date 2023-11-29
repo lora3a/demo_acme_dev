@@ -15,6 +15,7 @@ PORT ?= /dev/ttyUSB0
 
 USEMODULE += fmt
 USEMODULE += periph_adc
+USEMODULE += periph_spi_reconfigure
 USEMODULE += periph_cpuid
 USEMODULE += printf_float
 USEMODULE += saml21_backup_mode
