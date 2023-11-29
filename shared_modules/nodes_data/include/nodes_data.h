@@ -79,6 +79,20 @@ typedef struct node_CMT node_CMT;
 #define NODE_CMT_CLASS 5
 #define NODE_CMT_SIZE sizeof(node_CMT)
 
+struct node_BME688 {
+    node_header header;
+
+    int16_t temperature;
+    int16_t humidity;
+    int16_t pression;
+    uint32_t gas;
+};
+
+
+typedef struct node_BME688 node_BME688;
+#define NODE_BME688_CLASS 6
+#define NODE_BME688_SIZE sizeof(node_BME688)
+
 struct gateway_data {
     int16_t rssi;
     int8_t snr;
@@ -94,5 +108,6 @@ const char *CLASS_LIST[] = {
     "Acceleration + Temperature",
     "CO2 + Temperature",
     "Time of Flight",
-    "Ciccio me tocca"
+    "Ciccio me tocca",
+    "Node BME688 Temp + Hum + Press + Gas"
 };

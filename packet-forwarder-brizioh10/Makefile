@@ -1,14 +1,15 @@
 APPLICATION = packet-forwarder-brizioh10
 BOARD ?= berta-h10
 
-BASE ?= $(CURDIR)/../../
-LORA3ABASE ?= $(BASE)/lora3a-boards
-RIOTBASE ?= $(BASE)/RIOT
+BASE ?= $(CURDIR)/../
+LORA3ABASE ?= $(BASE)/../lora3a-boards
+RIOTBASE ?= $(BASE)/../RIOT
 
 EXTERNAL_BOARD_DIRS=$(LORA3ABASE)/boards
 EXTERNAL_MODULE_DIRS+=$(LORA3ABASE)/modules
-EXTERNAL_MODULE_DIRS+=$(CURDIR)/../shared_modules
+EXTERNAL_MODULE_DIRS+=$(BASE)/shared_modules
 EXTERNAL_PKG_DIRS=$(LORA3ABASE)/pkg
+
 QUIET ?= 1
 DEVELHELP ?= 1
 
