@@ -1,0 +1,57 @@
+APPLICATION = node-BME688
+BOARD ?= berta-h10
+
+BASE ?= $(CURDIR)/../../
+LORA3ABASE ?= $(BASE)/../lora3a-boards
+RIOTBASE ?= $(BASE)/../RIOT
+
+EXTERNAL_BOARD_DIRS=$(LORA3ABASE)/boards
+EXTERNAL_MODULE_DIRS+=$(LORA3ABASE)/modules
+EXTERNAL_MODULE_DIRS+=$(BASE)/shared_modules
+EXTERNAL_PKG_DIRS=$(LORA3ABASE)/pkg
+
+QUIET ?= 1
+PORT ?= /dev/ttyUSB0
+
+USEMODULE += fmt
+USEMODULE += periph_adc
+USEMODULE += periph_spi_reconfigure
+USEMODULE += periph_cpuid
+USEMODULE += printf_float
+USEMODULE += saml21_backup_mode
+USEMODULE += acme_lora
+USEMODULE += nodes_data
+USEMODULE += h10_adc
+
+USEMODULE += bme680_i2c bme680_fp
+
+ACME_PORT ?= 0
+
+ifeq ($(ACME_PORT), 0)
+CFLAGS += -DACME0_BUS_MODE=MODE_I2C
+CFLAGS += -DBME680_PARAM_I2C_DEV=ACME0_I2C_DEV -DBME680_PARAM_I2C_ADDR=0x76
+endif
+
+ifeq ($(ACME_PORT), 1)
+CFLAGS += -DACME1_BUS_MODE=MODE_I2C
+CFLAGS += -DBME680_PARAM_I2C_DEV=ACME1_I2C_DEV -DBME680_PARAM_I2C_ADDR=0x76
+endif
+
+ifeq ($(ACME_PORT), 2)
+CFLAGS += -DACME2_BUS_MODE=MODE_I2C
+CFLAGS += -DBME680_PARAM_I2C_DEV=ACME2_I2C_DEV -DBME680_PARAM_I2C_ADDR=0x76
+endif
+
+BW ?= 1
+CH ?= 868100000L
+
+ifneq ($(BW),)
+	CFLAGS+=-DDEFAULT_LORA_BANDWIDTH=$(BW)
+endif
+
+ifneq ($(CH),)
+	CFLAGS+=-DDEFAULT_LORA_CHANNEL=$(CH)
+endif
+
+include $(RIOTBASE)/Makefile.include
+include $(LORA3ABASE)/Makefile.include
