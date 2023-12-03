@@ -11,11 +11,23 @@ struct node_header {
 
     uint16_t vcc;
     uint16_t vpanel;
+    int8_t node_power;
+    uint8_t node_boost;
+    uint16_t sleep_time;
 };
 
 
 typedef struct node_header node_header;
 #define NODE_HEADER_SIZE sizeof(node_header)
+
+struct node_NOSENSOR {
+    node_header header;
+};
+
+typedef struct node_NOSENSOR node_NOSENSOR;
+#define NODE_NOSENSOR_CLASS 0
+#define NODE_NOSENSOR_SIZE sizeof(node_NOSENSOR)
+
 
 struct node_HT {
     node_header header;
@@ -103,7 +115,7 @@ typedef struct gateway_data gateway_data;
 
 
 const char *CLASS_LIST[] = {
-    "UNDEFINED",
+    "NO SENSOR",
     "Umidity + Temperature",
     "Acceleration + Temperature",
     "CO2 + Temperature",
