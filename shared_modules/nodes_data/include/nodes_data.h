@@ -96,7 +96,7 @@ struct node_BME688 {
 
     int16_t temperature;
     int16_t humidity;
-    int16_t pression;
+    int16_t pressure;
     uint32_t gas;
 };
 

@@ -123,7 +123,7 @@ void bme688_sensor_read(void)
 
     node_data.temperature = _temp;
     node_data.humidity = _hum;
-    node_data.pression = _press;
+    node_data.pressure = _press;
     node_data.gas = _gas;
 
     read_vcc_vpanel();
@@ -146,7 +146,7 @@ void bme688_sensor_read(void)
         node_data.header.vcc, node_data.header.vpanel,
         node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time,
         node_data.temperature, node_data.humidity,
-        node_data.pression, node_data.gas
+        node_data.pressure, node_data.gas
         );
 
     printf(
@@ -156,7 +156,7 @@ void bme688_sensor_read(void)
         node_data.header.vcc, node_data.header.vpanel,
         node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time,
         node_data.temperature, node_data.humidity,
-        node_data.pression, node_data.gas
+        node_data.pressure, node_data.gas
         );
 
     puts(payload_hex);

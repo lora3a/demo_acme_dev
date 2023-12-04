@@ -69,6 +69,22 @@ void b_init(void)
 
 }
 
+
+int8_t int8(const char *ptr)
+{
+    int8_t result = ptr[0];
+
+    return result;
+}
+
+
+uint8_t uint8(const char *ptr)
+{
+    uint8_t result = ptr[0];
+
+    return result;
+}
+
 uint16_t uint16(const char *ptr)
 {
     uint16_t result = ptr[0] + (ptr[1] << 8);
@@ -82,6 +98,17 @@ int16_t int16(const char *ptr)
 
     return result;
 }
+
+uint32_t uint32(const char *ptr)
+{
+    //printf("%2x %2x %2x  %2x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
+    uint32_t result = (ptr[0] & 0x000000ff) + ((ptr[1] << 8) & 0x0000ff00) + ((ptr[2] << 16) & 0x00ff0000) + ((ptr[3] << 24) & 0xff000000);
+
+    return result;
+}
+
+
+
 
 void *combine(void *o1, size_t s1, void *o2, size_t s2)
 {
@@ -240,10 +267,61 @@ void binaryToJsonCMT(const char *message, char *json)
 }
 
 //
+//	Converts the info part of the binary array in a json formatted string specifically for CMT Nodes
+//
+void binaryToJsonBME688(const char *message, char *json)
+{
+    char *p = (char *)message;
+    char strFmt[10];
+    double temp;
+    double hum;   
+    int16_t temperature;
+    int16_t humidity;
+    int16_t pressure;
+    uint32_t gas;
+
+    p += NODE_HEADER_SIZE;
+    temperature = int16(p);
+    temp = (double)temperature / 100.;
+    sprintf(strFmt, "%6.2f", temp);
+    printf("temperature   : %s\n", strFmt);
+    setStringJnode("temperature", strFmt, jNode);
+    strcat(json, jNode);
+
+    p += 2;
+    humidity = uint16(p);
+    hum = (double)humidity / 100.;
+    sprintf(strFmt, "%6.2f", hum);
+    printf("humidity      : %s\n", strFmt);
+    setStringJnode("humidity", strFmt, jNode);
+    strcat(json, jNode);
+
+    p += 2;
+    pressure = int16(p);
+    sprintf(strFmt, "%d", pressure);
+    printf("pressure      : %s\n", strFmt);
+    setStringJnode("pressure", strFmt, jNode);
+    strcat(json, jNode);
+
+
+    //  Solve structure allignement +4 instead of +22
+    p += 4;
+    gas = uint32(p);
+    sprintf(strFmt, "%ld", gas);
+    printf("gas           : %s\n", strFmt);
+    setStringJnode("gas", strFmt, jNode);
+    strcat(json, jNode);
+
+ 
+
+}
+
+//
 //	Converts the binary array of the header in a json formatted string for all Nodes
 //
 void binaryToJsonHeader(int16_t *rssi, int8_t *snr, uint16_t signature, uint8_t class,
-                        char *cpuid_hex, double vcc, double vpanel, char *json)
+                        char *cpuid_hex, double vcc, double vpanel,
+                        int8_t node_power, uint8_t node_boost, uint16_t sleep_time, char *json)
 {
     char strFmt[10];
 
@@ -270,9 +348,22 @@ void binaryToJsonHeader(int16_t *rssi, int8_t *snr, uint16_t signature, uint8_t 
     sprintf(strFmt, "%5.3f", vpanel);
     setNumericStringJnode("vpanel", strFmt, jNode);
     strcat(json, jNode);
+
+
+    sprintf(strFmt, "%3d", node_power);
+    setNumericStringJnode("node_power", strFmt, jNode);
+    strcat(json, jNode);
+
+    sprintf(strFmt, "%3d", node_boost);
+    setNumericStringJnode("node_boost", strFmt, jNode);
+    strcat(json, jNode);
+
+    sprintf(strFmt, "%5d", sleep_time);
+    setNumericStringJnode("sleep_time", strFmt, jNode);
+    strcat(json, jNode);
 }
 
-char strMsg[200];
+char strMsg[400];
 //uint8_t s_id[CPUID_LEN+1];
 char *s_id;
 
@@ -285,6 +376,9 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     uint8_t d_size;
     uint16_t vcc;
     uint16_t vpanel;
+    int8_t node_power;
+    uint8_t node_boost;
+    uint16_t sleep_time;
 
     gpio_write(GPIO_PIN(PA, 27), 0);
     memset(strMsg, 0, sizeof(strMsg));
@@ -308,6 +402,14 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             vcc = uint16(ptr);
             ptr += 2;
             vpanel = uint16(ptr);
+            ptr += 2;
+            node_power = int8(ptr);
+            ptr += 1;
+            node_boost = uint8(ptr);
+            ptr += 1;
+            sleep_time = uint16(ptr);
+          
+
             switch (s_class) {
             case NODE_HT_CLASS:
                 res = TRUE;
@@ -325,6 +427,10 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             case NODE_CMT_CLASS:
                 res = TRUE;
                 d_size = NODE_CMT_SIZE;
+                break;
+            case NODE_BME688_CLASS:
+                res = TRUE;
+                d_size = NODE_BME688_SIZE;
                 break;
 
             default:
@@ -346,11 +452,13 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             printf("Cpu Id        : %s\n", cpuid_hex);
             printf("Voltage       : vcc = %5.3f, vpanel = %5.3f\n", ((double)vcc / 1000.),
                    ((double)vpanel / 1000.));
-
+            printf("Node Power    : %d\n", node_power);
+            printf("Node Boost    : %d\n", node_boost);
+            printf("Sleep Time    : %d\n", sleep_time);
             memset(strMsg, 0, sizeof(strMsg));
             sprintf(strMsg, "{");
             binaryToJsonHeader(rssi, snr, signature, s_class, cpuid_hex, ((double)vcc / 1000.),
-                               ((double)vpanel / 1000.), strMsg);
+                               ((double)vpanel / 1000.), node_power, node_boost, sleep_time, strMsg);
             switch (s_class) {
             case NODE_HT_CLASS:
                 binaryToJsonHT(message, strMsg);
@@ -366,6 +474,9 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 binaryToJsonCMT(message, strMsg);
                 break;
 
+            case NODE_BME688_CLASS:
+                binaryToJsonBME688(message, strMsg);
+                break;
             default:
                 printf("Unknown Class, Packet is Rejected!\n");
                 res = FALSE;
@@ -376,9 +487,8 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 printf("%s\n", strMsg);
 
                 uart_write(UART_PORT, (uint8_t *)strMsg, strlen(strMsg));
-
                 xtimer_usleep(5000);
-                gpio_write(GPIO_PIN(PA, 27), 1);
+                
             }
         }
         else {
@@ -389,7 +499,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     else {
         printf("No Data sent to Fox D27\n");
     }
-
+    gpio_write(GPIO_PIN(PA, 27), 1);
 
 
 }
