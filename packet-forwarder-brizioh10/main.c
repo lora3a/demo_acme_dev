@@ -523,10 +523,12 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
        }
         else {
             printf("Wrong Packet Length %3d != %3d, Blob Packet Sent!\n", d_size, NODE_HEADER_SIZE);
+            res = FALSE;
         }
     }
     else {
         printf("Blob Sent to Fox D27\n");
+        res = FALSE;
     }
 
     if (res != FALSE) {
