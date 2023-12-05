@@ -41,7 +41,15 @@ typedef struct {
     ringbuffer_t rx_buf;
 } uart_ctx_t;
 
+#define MAX_JSON_MSG_LEN 1000
+#define MAX_JSON_NODE_LEN 100
 
+char jNode[MAX_JSON_NODE_LEN];
+char cpuid_hex[CPUID_LEN * 2 + 1];
+char strJasonMsg[MAX_JSON_MSG_LEN];
+char * pstrBlob;
+int lenBlob;
+char *s_id;
 
 static uart_ctx_t u_ctx;
 
@@ -138,8 +146,7 @@ void setNumericJnode(char *name, int value, char *jnode)
     sprintf(jnode, "\"%s\":%d,", name, value);
 }
 
-char jNode[100];
-char cpuid_hex[CPUID_LEN * 2 + 1];
+
 
 //
 //	Converts the info part of the binary array in a json formatted string specifically for CO2T Nodes
@@ -317,6 +324,43 @@ void binaryToJsonBME688(const char *message, char *json)
 }
 
 //
+//	Converts the binary data of unknown origin in a json formatted string blob
+//
+void binaryToJsonBlob(int16_t *rssi, int8_t *snr, char * data, int lendata, char *json)
+{
+    int availJson;
+    setNumericJnode("rssi", (int)*rssi, jNode);
+    strcat(json, jNode);
+
+    setNumericJnode("snr", (int)*snr, jNode);
+    strcat(json, jNode);
+
+ 
+    strcat(json, "\"blob\":\"");
+    availJson  = MAX_JSON_MSG_LEN-strlen(json)-1;
+    lenBlob = (lendata * 2 )+ 1;
+    if(lenBlob<availJson){
+        pstrBlob = malloc(lenBlob);
+        if (pstrBlob!=NULL) {
+            memset(pstrBlob,0,lenBlob);
+            fmt_bytes_hex(pstrBlob, (const uint8_t *)data, lendata);
+            strcat(json, pstrBlob);
+            free(pstrBlob);
+        }
+        else{
+            sprintf(jNode, "Cannot Allocate %d Bytes to Send Hex Blob\n", lenBlob);
+            strcat(json, jNode);
+       }
+    }
+    else{
+        sprintf(jNode, "Hex Blob %d > Bigger Than Available Jason String %d \n", lenBlob, availJson);
+        strcat(json, jNode);
+    }
+     strcat(json, "\",");
+
+}
+
+//
 //	Converts the binary array of the header in a json formatted string for all Nodes
 //
 void binaryToJsonHeader(int16_t *rssi, int8_t *snr, uint16_t signature, uint8_t class,
@@ -363,10 +407,6 @@ void binaryToJsonHeader(int16_t *rssi, int8_t *snr, uint16_t signature, uint8_t 
     strcat(json, jNode);
 }
 
-char strMsg[400];
-//uint8_t s_id[CPUID_LEN+1];
-char *s_id;
-
 void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
 {
     char *ptr = (char *)message;
@@ -381,15 +421,14 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     uint16_t sleep_time;
 
     gpio_write(GPIO_PIN(PA, 27), 0);
-    memset(strMsg, 0, sizeof(strMsg));
-    sprintf(strMsg, "\nRx Pkt  : %u bytes, RSSI: %i, SNR: %i\n", len, *rssi, *snr);
-    printf("%s", strMsg);
+    memset(strJasonMsg, 0, sizeof(strJasonMsg));
+    sprintf(strJasonMsg, "\nRx Pkt  : %u bytes, RSSI: %i, SNR: %i\n", len, *rssi, *snr);
+    printf("%s", strJasonMsg);
     signature =  uint16(message);
     if (signature == ACME_SIGNATURE) {
         if (len >= NODE_HEADER_SIZE) {
             ptr += 2;
             s_class = *ptr;
-
             printf("Class         : %03d\n", s_class);
             ptr += 1;
 
@@ -408,14 +447,15 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             node_boost = uint8(ptr);
             ptr += 1;
             sleep_time = uint16(ptr);
-          
-
             switch (s_class) {
+            case NODE_NOSENSOR_CLASS:
+                res = TRUE;
+                d_size = NODE_NOSENSOR_SIZE;
+                break;
             case NODE_HT_CLASS:
                 res = TRUE;
                 d_size = NODE_HT_SIZE;
                 break;
-
             case NODE_AT_CLASS:
                 res = TRUE;
                 d_size = NODE_AT_SIZE;
@@ -432,18 +472,17 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 res = TRUE;
                 d_size = NODE_BME688_SIZE;
                 break;
-
             default:
-                printf("Unknown Class, Packet is Rejected!\n");
+                printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
             }
         }
         else {
-            printf("Packet Too Short, Packet is Rejected!\n");
+            printf("Packet Too Short, Blob Packet Sent!\n");
         }
     }
     else {
-        printf("Wrong Signature, Packet is Rejected!\n");
+        printf("Wrong Signature, Blob Packet Sent!\n");
     }
 
     if (res) {
@@ -455,50 +494,54 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             printf("Node Power    : %d\n", node_power);
             printf("Node Boost    : %d\n", node_boost);
             printf("Sleep Time    : %d\n", sleep_time);
-            memset(strMsg, 0, sizeof(strMsg));
-            sprintf(strMsg, "{");
+            memset(strJasonMsg, 0, sizeof(strJasonMsg));
+            sprintf(strJasonMsg, "{");
             binaryToJsonHeader(rssi, snr, signature, s_class, cpuid_hex, ((double)vcc / 1000.),
-                               ((double)vpanel / 1000.), node_power, node_boost, sleep_time, strMsg);
+                               ((double)vpanel / 1000.), node_power, node_boost, sleep_time, strJasonMsg);
             switch (s_class) {
-            case NODE_HT_CLASS:
-                binaryToJsonHT(message, strMsg);
+            case NODE_NOSENSOR_CLASS:
                 break;
-
+            case NODE_HT_CLASS:
+                binaryToJsonHT(message, strJasonMsg);
+                break;
             case NODE_AT_CLASS:
-                binaryToJsonAT(message, strMsg);
+                binaryToJsonAT(message, strJasonMsg);
                 break;
             case NODE_CO2T_CLASS:
-                binaryToJsonCO2T(message, strMsg);
+                binaryToJsonCO2T(message, strJasonMsg);
                 break;
             case NODE_CMT_CLASS:
-                binaryToJsonCMT(message, strMsg);
+                binaryToJsonCMT(message, strJasonMsg);
                 break;
-
             case NODE_BME688_CLASS:
-                binaryToJsonBME688(message, strMsg);
+                binaryToJsonBME688(message, strJasonMsg);
                 break;
             default:
-                printf("Unknown Class, Packet is Rejected!\n");
+                printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
             }
-            if (res != FALSE) {
-                strMsg[strlen(strMsg) - 1] = '}';
-                strMsg[strlen(strMsg)] = '\n';
-                printf("%s\n", strMsg);
-
-                uart_write(UART_PORT, (uint8_t *)strMsg, strlen(strMsg));
-                xtimer_usleep(5000);
-                
-            }
-        }
+       }
         else {
-            printf("Wrong Packet Length %3d != %3d, Packet is Rejected!\n", d_size,
-                   NODE_HEADER_SIZE);
+            printf("Wrong Packet Length %3d != %3d, Blob Packet Sent!\n", d_size, NODE_HEADER_SIZE);
         }
     }
     else {
-        printf("No Data sent to Fox D27\n");
+        printf("Blob Sent to Fox D27\n");
     }
+
+    if (res != FALSE) {
+        xtimer_usleep(5000);
+    }else{
+        memset(strJasonMsg, 0, sizeof(strJasonMsg));
+        sprintf(strJasonMsg, "{");
+        binaryToJsonBlob(rssi, snr, (char *)message, len, strJasonMsg);
+    }
+    strJasonMsg[strlen(strJasonMsg) - 1] = '}';
+    strJasonMsg[strlen(strJasonMsg)] = '\n';
+    printf("%s\n", strJasonMsg);
+    uart_write(UART_PORT, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
+    xtimer_usleep(5000);
+    
     gpio_write(GPIO_PIN(PA, 27), 1);
 
 
