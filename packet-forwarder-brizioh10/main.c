@@ -146,17 +146,14 @@ void setNumericJnode(char *name, int value, char *jnode)
     sprintf(jnode, "\"%s\":%d,", name, value);
 }
 
-
-
 //
-//	Converts the info part of the binary array in a json formatted string specifically for CO2T Nodes
+//	Converts the info part of the binary array in a json formatted string specifically for SENSEAIR Nodes
 //
-void binaryToJsonCO2T(const char *message, char *json)
+void binaryToJsonSENSEAIR(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
     uint16_t conc_ppm;
-    int16_t temp_cC;
     int16_t temperature;
 
     p += NODE_HEADER_SIZE;
@@ -167,19 +164,11 @@ void binaryToJsonCO2T(const char *message, char *json)
     strcat(json, jNode);
 
     p += 2;
-    temp_cC = int16(p);
-    sprintf(strFmt, "%6.2f", ((double)temp_cC) / 100.);
-    printf("temp_cC        : %s\n", strFmt);
-    setNumericStringJnode("temp_cC", strFmt, jNode);
-    strcat(json, jNode);
-
-    p += 2;
     temperature = int16(p);
     sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
     printf("temperature   : %s\n", strFmt);
     setNumericStringJnode("temperature", strFmt, jNode);
     strcat(json, jNode);
-
 }
 
 //
@@ -318,10 +307,9 @@ void binaryToJsonBME688(const char *message, char *json)
     printf("gas           : %s\n", strFmt);
     setStringJnode("gas", strFmt, jNode);
     strcat(json, jNode);
-
- 
-
 }
+
+
 
 //
 //	Converts the binary data of unknown origin in a json formatted string blob
@@ -460,9 +448,9 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 res = TRUE;
                 d_size = NODE_AT_SIZE;
                 break;
-            case NODE_CO2T_CLASS:
+            case NODE_SENSEAIR_CLASS:
                 res = TRUE;
-                d_size = NODE_CO2T_SIZE;
+                d_size = NODE_SENSEAIR_SIZE;
                 break;
             case NODE_CMT_CLASS:
                 res = TRUE;
@@ -507,8 +495,8 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             case NODE_AT_CLASS:
                 binaryToJsonAT(message, strJasonMsg);
                 break;
-            case NODE_CO2T_CLASS:
-                binaryToJsonCO2T(message, strJasonMsg);
+            case NODE_SENSEAIR_CLASS:
+                binaryToJsonSENSEAIR(message, strJasonMsg);
                 break;
             case NODE_CMT_CLASS:
                 binaryToJsonCMT(message, strJasonMsg);
