@@ -159,7 +159,7 @@ void init_lora_setup(void)
 	lora.coderate = DEFAULT_LORA_CODERATE;
 	lora.channel = DEFAULT_LORA_CHANNEL;
 	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 0;    
+	lora.boost = 1;    
 }
 
 //  Prints lora settings

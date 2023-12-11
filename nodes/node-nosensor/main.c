@@ -63,7 +63,7 @@ void voltages_read(void)
 	lora.coderate = DEFAULT_LORA_CODERATE;
 	lora.channel = DEFAULT_LORA_CHANNEL;
 	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 0;
+	lora.boost = 1;
 
     node_data.header.signature = ACME_SIGNATURE;
     cpuid_get((void *)(node_data.header.cpuid));

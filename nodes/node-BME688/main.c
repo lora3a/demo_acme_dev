@@ -71,15 +71,15 @@ void bme688_sensor_read(void)
 	lora.coderate = DEFAULT_LORA_CODERATE;
 	lora.channel = DEFAULT_LORA_CHANNEL;
 	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 0;
+	lora.boost = 1;
 
     node_data.header.signature = ACME_SIGNATURE;
     cpuid_get((void *)(node_data.header.cpuid));
 
     node_data.header.s_class = NODE_BME688_CLASS;
 
-    node_data.header.node_power = lora.power;
     node_data.header.node_boost = lora.boost;
+    node_data.header.node_power = lora.power;
     node_data.header.sleep_time = SLEEP_TIME;
 
     int duration;
