@@ -5,6 +5,8 @@
 #include "periph/i2c.h"
 #include "periph/adc.h"
 #include "periph/cpuid.h"
+#include "periph/rtc.h"
+#include "rtc_utils.h"
 #include "fmt.h"
 
 #include "acme_lora.h"
@@ -23,6 +25,8 @@
       .flags = EXTWAKE_IN_PU \
     }
 #define SLEEP_TIME 10 /* in seconds; -1 to disable */
+
+#define USES_FRAM               0
 
 
 static saml21_extwake_t extwake = EXTWAKE;
@@ -138,6 +142,15 @@ void periodic_task(void)
     voltages_read();
 }
 
+void boot_task(void)
+{
+    struct tm time;
+
+    puts("Boot task.");
+    rtc_localtime(0, &time);
+    rtc_set_time(&time);
+}
+
 int main(void)
 {
     switch (saml21_wakeup_cause()) {
@@ -148,6 +161,13 @@ int main(void)
         periodic_task();
         break;
     default:
+        boot_task();
+
+        #if USES_FRAM
+        fram_init();
+        fram_erase();
+        #endif
+
         lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
         lora_off();
         printf("\n");

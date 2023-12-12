@@ -6,8 +6,8 @@
 #include "periph/adc.h"
 #include "periph/cpuid.h"
 #include "periph/rtc.h"
-#include "fmt.h"
 #include "rtc_utils.h"
+#include "fmt.h"
 
 #include "acme_lora.h"
 #include "saml21_backup_mode.h"
@@ -46,9 +46,10 @@ static h10_adc_t h10_adc_dev;
 #include "senseair_params.h"
 
 //  Defines
-#define NODE_PACKET_SIZE    NODE_SENSEAIR_SIZE
-#define NODE_CLASS          NODE_SENSEAIR_CLASS
+#define NODE_PACKET_SIZE            NODE_SENSEAIR_SIZE
+#define NODE_CLASS                  NODE_SENSEAIR_CLASS
 #define SENSEAIR_STATE_FRAM_ADDR    0
+#define USES_FRAM                   1
 
 //  Variables
 static senseair_t dev;
@@ -336,8 +337,6 @@ void boot_task(void)
 //  Main function
 int main(void)
 {
-    fram_init();
-
     //  Select wake up source
     switch (saml21_wakeup_cause()) {
     //  Push button
@@ -350,6 +349,13 @@ int main(void)
         break;
     //  Power on
     default:
+        boot_task();
+
+        #if USES_FRAM
+        fram_init();
+        fram_erase();
+        #endif
+
         init_lora_setup();
         lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
         lora_off();

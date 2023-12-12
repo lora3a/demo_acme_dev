@@ -5,6 +5,8 @@
 #include "periph/i2c.h"
 #include "periph/adc.h"
 #include "periph/cpuid.h"
+#include "periph/rtc.h"
+#include "rtc_utils.h"
 #include "fmt.h"
 
 #include "acme_lora.h"
@@ -43,9 +45,10 @@ static h10_adc_t h10_adc_dev;
 #include "lis2dw12_params.h"
 
 //  Defines
-#define NODE_PACKET_SIZE    NODE_AT_SIZE
-#define NODE_CLASS          NODE_AT_CLASS
+#define NODE_PACKET_SIZE        NODE_AT_SIZE
+#define NODE_CLASS              NODE_AT_CLASS
 #define SCALE_ACCELEROMETER     1.0
+#define USES_FRAM               0
 
 //  Variables
 static lis2dw12_t lis2dw12;
@@ -289,6 +292,15 @@ void periodic_task(void)
     sensor_read();
 }
 
+void boot_task(void)
+{
+    struct tm time;
+
+    puts("Boot task.");
+    rtc_localtime(0, &time);
+    rtc_set_time(&time);
+}
+
 //  Main function
 int main(void)
 {
@@ -304,6 +316,13 @@ int main(void)
         break;
     //  Power on
     default:
+        boot_task();
+
+        #if USES_FRAM
+        fram_init();
+        fram_erase();
+        #endif
+
         init_lora_setup();
         lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
         lora_off();
