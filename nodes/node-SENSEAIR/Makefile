@@ -55,8 +55,24 @@ ifneq ($(BW),)
 	CFLAGS+=-DDEFAULT_LORA_BANDWIDTH=$(BW)
 endif
 
+ifneq ($(SF),)
+	CFLAGS+=-DDEFAULT_LORA_SPREADING_FACTOR=$(SF)
+endif
+
+ifneq ($(CR),)
+	CFLAGS+=-DDEFAULT_LORA_CODERATE=$(CR)
+endif
+
 ifneq ($(CH),)
 	CFLAGS+=-DDEFAULT_LORA_CHANNEL=$(CH)
+endif
+
+ifneq ($(PW),)
+	CFLAGS+=-DDEFAULT_LORA_POWER=$(PW)
+endif
+
+ifneq ($(BS),)
+	CFLAGS+=-DDEFAULT_LORA_BOOST=$(BS)
 endif
 
 include $(RIOTBASE)/Makefile.include

@@ -71,6 +71,10 @@ ifneq ($(PW),)
 	CFLAGS+=-DDEFAULT_LORA_POWER=$(PW)
 endif
 
+ifneq ($(BS),)
+	CFLAGS+=-DDEFAULT_LORA_BOOST=$(BS)
+endif
+
 
 include $(RIOTBASE)/Makefile.include
 include $(LORA3ABASE)/Makefile.include
