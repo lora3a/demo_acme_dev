@@ -48,13 +48,13 @@ static h10_adc_t h10_adc_dev;
 //  Defines
 #define NODE_PACKET_SIZE            NODE_SENSEAIR_SIZE
 #define NODE_CLASS                  NODE_SENSEAIR_CLASS
-#define SENSEAIR_STATE_FRAM_ADDR    0
-#define USES_FRAM                   1
+#define SENSEAIR_STATE_FRAM_ADDR    (0)
+#define USES_FRAM                   (1)
 
 //  Variables
 static senseair_t dev;
 static senseair_abc_data_t abc_data;
-static node_SENSEAIR node_data;
+static node_senseair node_data;
 
 //  Sensor specific functions declaration
 //

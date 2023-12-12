@@ -32,7 +32,7 @@ static hdc3020_t hdc3020;
 static h10_adc_t h10_adc_dev;
 static lora_state_t lora;
 
-static node_HT node_data;
+static node_hdc3020 node_data;
 
 void read_vcc_vpanel(h10_adc_t *dev)
 {
@@ -53,7 +53,7 @@ void read_vcc_vpanel(h10_adc_t *dev)
     h10_adc_deinit(dev);
 }
 
-void node_HT_print(const node_HT *node)
+void node_hdc3020_print(const node_hdc3020 *node)
 {
     char cpu_id[CPUID_LEN * 2 + 1];
 
@@ -76,15 +76,15 @@ void node_HT_print(const node_HT *node)
         node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time,
         node_data.temperature, node_data.humidity);
 
-    char payload_hex[NODE_HT_SIZE * 2 + 1];
+    char payload_hex[NODE_HDC3020_SIZE * 2 + 1];
 
-    fmt_bytes_hex(payload_hex, (uint8_t *)node, NODE_HT_SIZE);
-    payload_hex[NODE_HT_SIZE * 2] = 0;
+    fmt_bytes_hex(payload_hex, (uint8_t *)node, NODE_HDC3020_SIZE);
+    payload_hex[NODE_HDC3020_SIZE * 2] = 0;
 
     printf("[HEX DATA] %s.\n", payload_hex);
 }
 
-void hdc3020_sensor_read(hdc3020_t *dev, node_HT *node_data)
+void hdc3020_sensor_read(hdc3020_t *dev, node_hdc3020 *node_data)
 {
     double temp;
     double hum;
@@ -106,7 +106,7 @@ void hdc3020_sensor_read(hdc3020_t *dev, node_HT *node_data)
 
 void sensors_read(void)
 {
-    char payload[NODE_HT_SIZE * 1];
+    char payload[NODE_HDC3020_SIZE * 1];
 
     memset(&payload, 0, sizeof(payload));
     memset(&lora, 0, sizeof(lora));
@@ -119,7 +119,7 @@ void sensors_read(void)
 
     node_data.header.signature = ACME_SIGNATURE;
     cpuid_get((void *)(node_data.header.cpuid));
-    node_data.header.s_class = NODE_HT_CLASS;
+    node_data.header.s_class = NODE_HDC3020_CLASS;
     node_data.header.node_power = lora.power;
     node_data.header.node_boost = lora.boost;
     node_data.header.sleep_time = SLEEP_TIME;
@@ -128,9 +128,9 @@ void sensors_read(void)
 
     read_vcc_vpanel(&h10_adc_dev);
 
-    node_HT_print(&node_data);
+    node_hdc3020_print(&node_data);
 
-    memcpy(payload, &node_data, NODE_HT_SIZE);
+    memcpy(payload, &node_data, NODE_HDC3020_SIZE);
 
     if (lora_init(&(lora)) != 0) {
         return;

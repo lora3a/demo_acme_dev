@@ -32,7 +32,7 @@
 static saml21_extwake_t extwake = EXTWAKE;
 static h10_adc_t h10_adc_dev;
 
-static node_NOSENSOR node_data;
+static node_nosensor node_data;
 
 static lora_state_t lora;
 

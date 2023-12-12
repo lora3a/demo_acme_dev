@@ -37,7 +37,7 @@ static h10_adc_t h10_adc_dev;
 //                      START SENSOR SECTION
 //
 //  This Section Is Specific for The Selected Sensor
-//      NODE-CMT
+//      NODE-LIS2DW12-CMT
 //  Sensor : CiccioMeTocca featuring STmicroelectronics LIS2DW12
 //
 
@@ -47,18 +47,18 @@ static h10_adc_t h10_adc_dev;
 #include "lis2dw12_params.h"
 
 //  Defines
-#define NODE_PACKET_SIZE    NODE_CMT_SIZE
-#define NODE_CLASS          NODE_CMT_CLASS
-#define EVENT_NONE      0x00
-#define EVENT_X         0x01
-#define EVENT_Y         0x02
-#define EVENT_Z         0x04
-#define EVENT_XYZ       (EVENT_X | EVENT_Y | EVENT_Z)
-#define USES_FRAM               0
+#define NODE_PACKET_SIZE    NODE_LIS2DW12_CMT_SIZE
+#define NODE_CLASS          NODE_LIS2DW12_CMT_CLASS
+#define EVENT_NONE          (0x00)
+#define EVENT_X             (0x01)
+#define EVENT_Y             (0x02)
+#define EVENT_Z             (0x04)
+#define EVENT_XYZ           (EVENT_X | EVENT_Y | EVENT_Z)
+#define USES_FRAM           (0)
 
 //  Variables
 static lis2dw12_t lis2dw12;
-static node_CMT node_data;
+static node_lis2dw12_cmt node_data;
 static int cmt_alert = EVENT_NONE;
 
 //  Sensor specific functions declaration

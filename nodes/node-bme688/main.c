@@ -34,7 +34,7 @@ static saml21_extwake_t extwake = EXTWAKE;
 static bme680_t bme688_dev;
 static h10_adc_t h10_adc_dev;
 
-static node_BME688 node_data;
+static node_bme688 node_data;
 
 static int16_t _temp;
 static int16_t _press;

@@ -19,29 +19,29 @@ struct node_header {
 typedef struct node_header node_header;
 #define NODE_HEADER_SIZE sizeof(node_header)
 
-//
-struct node_NOSENSOR {
+// Node without sensors.
+struct node_nosensor {
     node_header header;
 };
 
-typedef struct node_NOSENSOR node_NOSENSOR;
+typedef struct node_nosensor node_nosensor;
 #define NODE_NOSENSOR_CLASS 0
-#define NODE_NOSENSOR_SIZE sizeof(node_NOSENSOR)
+#define NODE_NOSENSOR_SIZE sizeof(node_nosensor)
 
 //
-struct node_HT {
+struct node_hdc3020 {
     node_header header;
 
     int16_t temperature;
     uint16_t humidity;
 };
 
-typedef struct node_HT node_HT;
-#define NODE_HT_CLASS 1
-#define NODE_HT_SIZE sizeof(node_HT)
+typedef struct node_hdc3020 node_hdc3020;
+#define NODE_HDC3020_CLASS 1
+#define NODE_HDC3020_SIZE sizeof(node_hdc3020)
 
 //
-struct node_AT {
+struct node_lis2dw12 {
     node_header header;
 
     int16_t acc_x;
@@ -50,21 +50,21 @@ struct node_AT {
     int16_t temperature;
 };
 
-typedef struct node_AT node_AT;
-#define NODE_AT_CLASS 2
-#define NODE_AT_SIZE sizeof(node_AT)
+typedef struct node_lis2dw12 node_lis2dw12;
+#define NODE_LIS2DW12_CLASS 2
+#define NODE_LIS2DW12_SIZE sizeof(node_lis2dw12)
 
 //
-struct node_SENSEAIR {
+struct node_senseair {
     node_header header;
 
     uint16_t conc_ppm;
     int16_t temperature;
 };
 
-typedef struct node_SENSEAIR node_SENSEAIR;
+typedef struct node_senseair node_senseair;
 #define NODE_SENSEAIR_CLASS 3
-#define NODE_SENSEAIR_SIZE sizeof(node_SENSEAIR)
+#define NODE_SENSEAIR_SIZE sizeof(node_senseair)
 
 //
 struct node_D {
@@ -78,18 +78,18 @@ typedef struct node_D node_D;
 #define NODE_D_SIZE sizeof(node_D)
 
 //
-struct node_CMT {
+struct node_lis2dw12_cmt {
     node_header header;
 
     uint8_t alert;
 };
 
-typedef struct node_CMT node_CMT;
-#define NODE_CMT_CLASS 5
-#define NODE_CMT_SIZE sizeof(node_CMT)
+typedef struct node_lis2dw12_cmt node_lis2dw12_cmt;
+#define NODE_LIS2DW12_CMT_CLASS 5
+#define NODE_LIS2DW12_CMT_SIZE sizeof(node_lis2dw12_cmt)
 
 //
-struct node_BME688 {
+struct node_bme688 {
     node_header header;
 
     int16_t temperature;
@@ -98,9 +98,9 @@ struct node_BME688 {
     uint32_t gas;
 };
 
-typedef struct node_BME688 node_BME688;
+typedef struct node_bme688 node_bme688;
 #define NODE_BME688_CLASS 6
-#define NODE_BME688_SIZE sizeof(node_BME688)
+#define NODE_BME688_SIZE sizeof(node_bme688)
 
 //
 struct gateway_data {

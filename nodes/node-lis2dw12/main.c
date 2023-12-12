@@ -36,7 +36,7 @@ static h10_adc_t h10_adc_dev;
 //                      START SENSOR SECTION
 //
 //  This Section Is Specific for The Selected Sensor
-//      NODE-AT
+//      NODE-LIS2DW12
 //  Sensor : STmicroelectronics LIS2DW12
 //
 
@@ -45,14 +45,14 @@ static h10_adc_t h10_adc_dev;
 #include "lis2dw12_params.h"
 
 //  Defines
-#define NODE_PACKET_SIZE        NODE_AT_SIZE
-#define NODE_CLASS              NODE_AT_CLASS
+#define NODE_PACKET_SIZE        NODE_LIS2DW12_SIZE
+#define NODE_CLASS              NODE_LIS2DW12_CLASS
 #define SCALE_ACCELEROMETER     1.0
 #define USES_FRAM               0
 
 //  Variables
 static lis2dw12_t lis2dw12;
-static node_AT node_data;
+static node_lis2dw12 node_data;
 
 //  Sensor specific functions declaration
 //
