@@ -47,7 +47,7 @@ typedef struct {
 char jNode[MAX_JSON_NODE_LEN];
 char cpuid_hex[CPUID_LEN * 2 + 1];
 char strJasonMsg[MAX_JSON_MSG_LEN];
-char * pstrBlob;
+char *pstrBlob;
 int lenBlob;
 char *s_id;
 
@@ -110,7 +110,10 @@ int16_t int16(const char *ptr)
 uint32_t uint32(const char *ptr)
 {
     //printf("%2x %2x %2x  %2x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
-    uint32_t result = (ptr[0] & 0x000000ff) + ((ptr[1] << 8) & 0x0000ff00) + ((ptr[2] << 16) & 0x00ff0000) + ((ptr[3] << 24) & 0xff000000);
+    uint32_t result = (ptr[0] & 0x000000ff) +
+                      ((ptr[1] <<
+                        8) & 0x0000ff00) +
+                      ((ptr[2] << 16) & 0x00ff0000) + ((ptr[3] << 24) & 0xff000000);
 
     return result;
 }
@@ -149,7 +152,7 @@ void setNumericJnode(char *name, int value, char *jnode)
 //
 //	Converts the info part of the binary array in a json formatted string specifically for SENSEAIR Nodes
 //
-void binaryToJsonSENSEAIR(const char *message, char *json)
+void binary_to_json_senseair(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
@@ -174,7 +177,7 @@ void binaryToJsonSENSEAIR(const char *message, char *json)
 //
 //	Converts the info part of the binary array in a json formatted string specifically for AT Nodes
 //
-void binaryToJsonAT(const char *message, char *json)
+void binary_to_json_lis2dw12(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
@@ -217,7 +220,7 @@ void binaryToJsonAT(const char *message, char *json)
 //
 //	Converts the info part of the binary array in a json formatted string specifically for HT Nodes
 //
-void binaryToJsonHT(const char *message, char *json)
+void binary_to_json_hdc3020(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
@@ -248,7 +251,7 @@ void binaryToJsonHT(const char *message, char *json)
 //
 //	Converts the info part of the binary array in a json formatted string specifically for CMT Nodes
 //
-void binaryToJsonCMT(const char *message, char *json)
+void binary_to_json_lis2dw12_cmt(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
@@ -265,12 +268,12 @@ void binaryToJsonCMT(const char *message, char *json)
 //
 //	Converts the info part of the binary array in a json formatted string specifically for CMT Nodes
 //
-void binaryToJsonBME688(const char *message, char *json)
+void binary_to_json_bme688(const char *message, char *json)
 {
     char *p = (char *)message;
     char strFmt[10];
     double temp;
-    double hum;   
+    double hum;
     int16_t temperature;
     int16_t humidity;
     int16_t pressure;
@@ -314,37 +317,39 @@ void binaryToJsonBME688(const char *message, char *json)
 //
 //	Converts the binary data of unknown origin in a json formatted string blob
 //
-void binaryToJsonBlob(int16_t *rssi, int8_t *snr, char * data, int lendata, char *json)
+void binaryToJsonBlob(int16_t *rssi, int8_t *snr, char *data, int lendata, char *json)
 {
     int availJson;
+
     setNumericJnode("rssi", (int)*rssi, jNode);
     strcat(json, jNode);
 
     setNumericJnode("snr", (int)*snr, jNode);
     strcat(json, jNode);
 
- 
+
     strcat(json, "\"blob\":\"");
-    availJson  = MAX_JSON_MSG_LEN-strlen(json)-1;
-    lenBlob = (lendata * 2 )+ 1;
-    if(lenBlob<availJson){
+    availJson = MAX_JSON_MSG_LEN - strlen(json) - 1;
+    lenBlob = (lendata * 2) + 1;
+    if (lenBlob < availJson) {
         pstrBlob = malloc(lenBlob);
-        if (pstrBlob!=NULL) {
-            memset(pstrBlob,0,lenBlob);
+        if (pstrBlob != NULL) {
+            memset(pstrBlob, 0, lenBlob);
             fmt_bytes_hex(pstrBlob, (const uint8_t *)data, lendata);
             strcat(json, pstrBlob);
             free(pstrBlob);
         }
-        else{
+        else {
             sprintf(jNode, "Cannot Allocate %d Bytes to Send Hex Blob\n", lenBlob);
             strcat(json, jNode);
-       }
+        }
     }
-    else{
-        sprintf(jNode, "Hex Blob %d > Bigger Than Available Jason String %d \n", lenBlob, availJson);
+    else {
+        sprintf(jNode, "Hex Blob %d > Bigger Than Available Jason String %d \n", lenBlob,
+                availJson);
         strcat(json, jNode);
     }
-     strcat(json, "\",");
+    strcat(json, "\",");
 
 }
 
@@ -440,21 +445,21 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 res = TRUE;
                 d_size = NODE_NOSENSOR_SIZE;
                 break;
-            case NODE_HT_CLASS:
+            case NODE_HDC3020_CLASS:
                 res = TRUE;
-                d_size = NODE_HT_SIZE;
+                d_size = NODE_HDC3020_SIZE;
                 break;
-            case NODE_AT_CLASS:
+            case NODE_LIS2DW12_CLASS:
                 res = TRUE;
-                d_size = NODE_AT_SIZE;
+                d_size = NODE_LIS2DW12_SIZE;
                 break;
             case NODE_SENSEAIR_CLASS:
                 res = TRUE;
                 d_size = NODE_SENSEAIR_SIZE;
                 break;
-            case NODE_CMT_CLASS:
+            case NODE_LIS2DW12_CMT_CLASS:
                 res = TRUE;
-                d_size = NODE_CMT_SIZE;
+                d_size = NODE_LIS2DW12_CMT_SIZE;
                 break;
             case NODE_BME688_CLASS:
                 res = TRUE;
@@ -485,30 +490,31 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             memset(strJasonMsg, 0, sizeof(strJasonMsg));
             sprintf(strJasonMsg, "{");
             binaryToJsonHeader(rssi, snr, signature, s_class, cpuid_hex, ((double)vcc / 1000.),
-                               ((double)vpanel / 1000.), node_power, node_boost, sleep_time, strJasonMsg);
+                               ((double)vpanel / 1000.), node_power, node_boost, sleep_time,
+                               strJasonMsg);
             switch (s_class) {
             case NODE_NOSENSOR_CLASS:
                 break;
-            case NODE_HT_CLASS:
-                binaryToJsonHT(message, strJasonMsg);
+            case NODE_HDC3020_CLASS:
+                binary_to_json_hdc3020(message, strJasonMsg);
                 break;
-            case NODE_AT_CLASS:
-                binaryToJsonAT(message, strJasonMsg);
+            case NODE_LIS2DW12_CLASS:
+                binary_to_json_lis2dw12(message, strJasonMsg);
                 break;
             case NODE_SENSEAIR_CLASS:
-                binaryToJsonSENSEAIR(message, strJasonMsg);
+                binary_to_json_senseair(message, strJasonMsg);
                 break;
-            case NODE_CMT_CLASS:
-                binaryToJsonCMT(message, strJasonMsg);
+            case NODE_LIS2DW12_CMT_CLASS:
+                binary_to_json_lis2dw12_cmt(message, strJasonMsg);
                 break;
             case NODE_BME688_CLASS:
-                binaryToJsonBME688(message, strJasonMsg);
+                binary_to_json_bme688(message, strJasonMsg);
                 break;
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
             }
-       }
+        }
         else {
             printf("Wrong Packet Length %3d != %3d, Blob Packet Sent!\n", d_size, NODE_HEADER_SIZE);
             res = FALSE;
@@ -521,7 +527,8 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
 
     if (res != FALSE) {
         xtimer_usleep(5000);
-    }else{
+    }
+    else {
         memset(strJasonMsg, 0, sizeof(strJasonMsg));
         sprintf(strJasonMsg, "{");
         binaryToJsonBlob(rssi, snr, (char *)message, len, strJasonMsg);
@@ -531,7 +538,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     printf("%s\n", strJasonMsg);
     uart_write(UART_PORT, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
     xtimer_usleep(5000);
-    
+
     gpio_write(GPIO_PIN(PA, 27), 1);
 
 
@@ -544,6 +551,7 @@ void report_lora_setup(void)
     printf("LORA.CR %d\n", DEFAULT_LORA_CODERATE);
     printf("LORA.CH %ld\n", DEFAULT_LORA_CHANNEL);
     printf("LORA.PW %d\n", DEFAULT_LORA_POWER);
+    printf("LORA.BS %d\n", DEFAULT_LORA_BOOST);
 
 }
 int main(void)
