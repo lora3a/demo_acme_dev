@@ -58,18 +58,18 @@ void voltages_read(void)
     memset(&payload, 0, sizeof(payload));
     memset(&lora, 0, sizeof(lora));
 
-	lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
-	lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
-	lora.coderate = DEFAULT_LORA_CODERATE;
-	lora.channel = DEFAULT_LORA_CHANNEL;
-	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 1;
+    lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
+    lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
+    lora.coderate = DEFAULT_LORA_CODERATE;
+    lora.channel = DEFAULT_LORA_CHANNEL;
+    lora.power = DEFAULT_LORA_POWER;
+    lora.boost = DEFAULT_LORA_BOOST;
 
     node_data.header.signature = ACME_SIGNATURE;
     cpuid_get((void *)(node_data.header.cpuid));
 
     node_data.header.s_class = NODE_NOSENSOR_CLASS;
- 
+
     node_data.header.node_power = lora.power;
     node_data.header.node_boost = lora.boost;
     node_data.header.sleep_time = SLEEP_TIME;
@@ -77,6 +77,7 @@ void voltages_read(void)
     read_vcc_vpanel();
 
     char cpuid[CPUID_LEN * 2 + 1];
+
     memcpy(payload, &node_data, NODE_NOSENSOR_SIZE);
     fmt_bytes_hex(cpuid, node_data.header.cpuid, CPUID_LEN);
     cpuid[CPUID_LEN * 2] = 0;
@@ -147,8 +148,8 @@ int main(void)
         periodic_task();
         break;
     default:
-		lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
-		lora_off();
+        lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
+        lora_off();
         printf("\n");
         printf("--------------------------------------\n");
         printf("- Test without sensors For Berta-H10 -\n");
@@ -173,4 +174,3 @@ int main(void)
     // never reached
     return 0;
 }
-

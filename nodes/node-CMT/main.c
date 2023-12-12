@@ -35,7 +35,7 @@ static h10_adc_t h10_adc_dev;
 //                      START SENSOR SECTION
 //
 //  This Section Is Specific for The Selected Sensor
-//      NODE-CMT 
+//      NODE-CMT
 //  Sensor : CiccioMeTocca featuring STmicroelectronics LIS2DW12
 //
 
@@ -52,7 +52,7 @@ static h10_adc_t h10_adc_dev;
 #define EVENT_Y         0x02
 #define EVENT_Z         0x04
 #define EVENT_XYZ       (EVENT_X | EVENT_Y | EVENT_Z)
- 
+
 //  Variables
 static lis2dw12_t lis2dw12;
 static node_CMT node_data;
@@ -63,14 +63,14 @@ static int cmt_alert = EVENT_NONE;
 //  Read Sensor
 void cmt_sensor_read(void);
 //  Format Sensor Data
-void format_cmt_info(int bln_hex, char * msg);
+void format_cmt_info(int bln_hex, char *msg);
 
 //  Sensor specific functions pointers
 //
 //  Read Sensor
-void (*sensor_read_ptr)(void) = &cmt_sensor_read; 
+void (*sensor_read_ptr)(void) = &cmt_sensor_read;
 //  Format Sensor Data
-void (*format_info_ptr)(int, char *) = &format_cmt_info; 
+void (*format_info_ptr)(int, char *) = &format_cmt_info;
 
 //  Sensor specific functions code
 //
@@ -78,9 +78,9 @@ void (*format_info_ptr)(int, char *) = &format_cmt_info;
 
 void cmt_sensor_read(void)
 {
-int step = 0;
-uint8_t data;
-int32_t ret;
+    int step = 0;
+    uint8_t data;
+    int32_t ret;
 
     node_data.alert = cmt_alert;
     //
@@ -88,31 +88,27 @@ int32_t ret;
     //
     ret = lis2dw12_init(&lis2dw12, &lis2dw12_params[0]);
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Enable Block Data Update
         ret = lis2dw12_block_data_update_set(&lis2dw12.ctx, PROPERTY_ENABLE);
     }
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Set full scale 2g
         ret = lis2dw12_full_scale_set(&lis2dw12.ctx, LIS2DW12_2g);
     }
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Enable Wak-up interrupt - CTRL4_INT1_PAD_CTRL
         data = 0x20;
         //ret = lis2dw12_write_reg(&lis2dw12.ctx, 0x23, &data, 1);
-        ret = lis2dw12_pin_int1_route_set(&lis2dw12.ctx, (lis2dw12_ctrl4_int1_pad_ctrl_t *) &data);
+        ret = lis2dw12_pin_int1_route_set(&lis2dw12.ctx, (lis2dw12_ctrl4_int1_pad_ctrl_t *)&data);
     }
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Threshold set - WAKE_UP_THS
         data = 0x01;
@@ -120,8 +116,7 @@ int32_t ret;
         ret = lis2dw12_wkup_threshold_set(&lis2dw12.ctx, data);
     }
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Duration set - WAKE_UP_DUR
         data = 0x00;
@@ -133,8 +128,7 @@ int32_t ret;
     //  Start sensor
     //
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Set ODR 100Hz,Low-Power mode 1(12 bit) - CTRL1
         //data = 0x50;
@@ -142,47 +136,46 @@ int32_t ret;
         data = LIS2DW12_XL_ODR_100Hz;
         ret = lis2dw12_data_rate_set(&lis2dw12.ctx, data);
         //  Settling time ( 1 sample, i.e. 1/ODR )
-        xtimer_usleep(250000);        
-    }     
+        xtimer_usleep(250000);
+    }
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         step++;
         //  Enable interrupts - CTRL7
         data = 0x20;
         //ret = lis2dw12_write_reg(&lis2dw12.ctx, 0x3f, &data, 1);
-        ret = lis2dw12_pin_int1_route_set(&lis2dw12.ctx, (lis2dw12_ctrl4_int1_pad_ctrl_t *) &data);
-    }     
+        ret = lis2dw12_pin_int1_route_set(&lis2dw12.ctx, (lis2dw12_ctrl4_int1_pad_ctrl_t *)&data);
+    }
 
 
-    if (ret == LIS2DW12_OK)
-    {
+    if (ret == LIS2DW12_OK) {
         printf("Wake up mode setup : SUCCESS.\n");
-    }else{
-        printf("Wake up mode setup : FAILED @ step %d.\n",step);
+    }
+    else {
+        printf("Wake up mode setup : FAILED @ step %d.\n", step);
 
     }
 }
 
 //  Format Sensor Data
-void format_cmt_info(int bln_hex, char * msg)
+void format_cmt_info(int bln_hex, char *msg)
 {
 
-    if(bln_hex){
-       sprintf(msg,
-                    "Alert : %04X",
-                    node_data.alert
-        );
-    }
-    else{
+    if (bln_hex) {
         sprintf(msg,
-                    "Alert : %05d",
-                    node_data.alert
-        );
+                "Alert : %04X",
+                node_data.alert
+                );
+    }
+    else {
+        sprintf(msg,
+                "Alert : %05d",
+                node_data.alert
+                );
     }
 }
 
-//  
+//
 //                      END SENSOR SECTION
 //  ----------------------------------------------------------------------
 
@@ -190,12 +183,12 @@ void format_cmt_info(int bln_hex, char * msg)
 void init_lora_setup(void)
 {
     memset(&lora, 0, sizeof(lora));
-	lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
-	lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
-	lora.coderate = DEFAULT_LORA_CODERATE;
-	lora.channel = DEFAULT_LORA_CHANNEL;
-	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 1;    
+    lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
+    lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
+    lora.coderate = DEFAULT_LORA_CODERATE;
+    lora.channel = DEFAULT_LORA_CHANNEL;
+    lora.power = DEFAULT_LORA_POWER;
+    lora.boost = DEFAULT_LORA_BOOST;
 }
 
 //  Prints lora settings
@@ -238,7 +231,7 @@ void read_vcc_vpanel(void)
 void set_node_header(void)
 {
     //  Reset node structure
-    memset(&node_data,0,sizeof(node_data));
+    memset(&node_data, 0, sizeof(node_data));
 
     //  Fill header
     node_data.header.signature = ACME_SIGNATURE;
@@ -251,38 +244,39 @@ void set_node_header(void)
 }
 
 //  Formats the string used to report header info
-void format_header_info(int bln_hex, char * msg)
+void format_header_info(int bln_hex, char *msg)
 {
     char cpuid[CPUID_LEN * 2 + 1];
 
     fmt_bytes_hex(cpuid, node_data.header.cpuid, CPUID_LEN);
     cpuid[CPUID_LEN * 2] = 0;
 
-    if(bln_hex){
-       sprintf(msg,
-                    "SIGNATURE: %04X, NODE_CLASS: %02X, CPUID: %s, VCC: %04X, VPANEL: %04X, BOOST: %01X, POWER: %02X, SLEEP: %04X",
-                    node_data.header.signature,
-                    node_data.header.s_class, cpuid,
-                    node_data.header.vcc, node_data.header.vpanel,
-                    node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time
-        );
-    }
-    else{
+    if (bln_hex) {
         sprintf(msg,
-                    "SIGNATURE: %04d, NODE_CLASS: %03d, CPUID: %s, VCC: %04d, VPANEL: %04d, BOOST: %01d, POWER: %03d, SLEEP: %05d",
-                    node_data.header.signature,
-                    node_data.header.s_class, cpuid,
-                    node_data.header.vcc, node_data.header.vpanel,
-                    node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time
-        );
+                "SIGNATURE: %04X, NODE_CLASS: %02X, CPUID: %s, VCC: %04X, VPANEL: %04X, BOOST: %01X, POWER: %02X, SLEEP: %04X",
+                node_data.header.signature,
+                node_data.header.s_class, cpuid,
+                node_data.header.vcc, node_data.header.vpanel,
+                node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time
+                );
+    }
+    else {
+        sprintf(msg,
+                "SIGNATURE: %04d, NODE_CLASS: %03d, CPUID: %s, VCC: %04d, VPANEL: %04d, BOOST: %01d, POWER: %03d, SLEEP: %05d",
+                node_data.header.signature,
+                node_data.header.s_class, cpuid,
+                node_data.header.vcc, node_data.header.vpanel,
+                node_data.header.node_boost, node_data.header.node_power, node_data.header.sleep_time
+                );
     }
 }
 
 //  Transfers data in the node structure in a binary array to be transmitted,
-void transmit_packet(void){
+void transmit_packet(void)
+{
     char payload[NODE_PACKET_SIZE * 1];
 
-    memset(&payload, 0, sizeof(payload));  
+    memset(&payload, 0, sizeof(payload));
     memcpy(payload, &node_data, NODE_PACKET_SIZE);
 
     if (lora_init(&(lora)) != 0) {
@@ -300,10 +294,10 @@ void transmit_packet(void){
 
     lora_write(&packet);
     puts("Lora transmit packet.");
-    lora_off();    
+    lora_off();
 }
 
-//  
+//
 //  Performs all necessary operation to :
 //  - Init lora parms
 //  - Fill header fields
@@ -315,28 +309,28 @@ void sensor_read(void)
     char payload_hex[NODE_PACKET_SIZE * 2 + 1];
     char infomsg[200];
 
-    //  Init lora parameters      
+    //  Init lora parameters
     init_lora_setup();
 
     //  Fill packet header
     set_node_header();
- 
+
     //  Read data from sensor
     (*sensor_read_ptr)();
 
     //  Report packet - info
     //  Header
-    format_header_info(false,infomsg);
-    printf("%s, ",infomsg);
+    format_header_info(false, infomsg);
+    printf("%s, ", infomsg);
     //  Data
     (*format_info_ptr)(false, infomsg);
-    printf("%s\n",infomsg);
+    printf("%s\n", infomsg);
 
     //  Report packet - info - hex format
-    format_header_info(true,infomsg);
-    printf("%s, ",infomsg);
-     (*format_info_ptr)(true, infomsg);
-    printf("%s\n",infomsg);
+    format_header_info(true, infomsg);
+    printf("%s, ", infomsg);
+    (*format_info_ptr)(true, infomsg);
+    printf("%s\n", infomsg);
 
     //  Report packet binary - hex format
     fmt_bytes_hex(payload_hex, (uint8_t *)&node_data, NODE_PACKET_SIZE);
@@ -365,19 +359,19 @@ int main(void)
 {
     //  Select wake up source
     switch (saml21_wakeup_cause()) {
-        //  Push button
+    //  Push button
     case BACKUP_EXTWAKE:
         wakeup_task();
         break;
-        //  Rtc
+    //  Rtc
     case BACKUP_RTC:
         periodic_task();
         break;
-        //  Power on
+    //  Power on
     default:
         init_lora_setup();
-		lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
-		lora_off();
+        lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
+        lora_off();
         printf("\n");
         printf("-------------------------------------\n");
         printf("-      Test Node-CMT Berta-H10      -\n");

@@ -66,12 +66,12 @@ void bme688_sensor_read(void)
     memset(&payload, 0, sizeof(payload));
     memset(&lora, 0, sizeof(lora));
 
-	lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
-	lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
-	lora.coderate = DEFAULT_LORA_CODERATE;
-	lora.channel = DEFAULT_LORA_CHANNEL;
-	lora.power = DEFAULT_LORA_POWER;
-	lora.boost = 1;
+    lora.bandwidth = DEFAULT_LORA_BANDWIDTH;
+    lora.spreading_factor = DEFAULT_LORA_SPREADING_FACTOR;
+    lora.coderate = DEFAULT_LORA_CODERATE;
+    lora.channel = DEFAULT_LORA_CHANNEL;
+    lora.power = DEFAULT_LORA_POWER;
+    lora.boost = DEFAULT_LORA_BOOST;
 
     node_data.header.signature = ACME_SIGNATURE;
     cpuid_get((void *)(node_data.header.cpuid));
@@ -201,8 +201,8 @@ int main(void)
         periodic_task();
         break;
     default:
-		lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
-		lora_off();
+        lora_init(&(lora));  // needed to set the radio in order to have minimum power consumption
+        lora_off();
         printf("\n");
         printf("-------------------------------------\n");
         printf("-      Test BME688 For Berta-H10    -\n");
@@ -218,7 +218,7 @@ int main(void)
         if (SLEEP_TIME > -1) {
             printf("Periodic task running every %d seconds.\n", SLEEP_TIME);
         }
-        
+
         bme688_sensor_read();
         break;
     }
