@@ -83,7 +83,7 @@ void lis2dw12_sensor_read(void)
     }
     ztimer_sleep(ZTIMER_MSEC, 20);
 
-    //  Dummy read to be discarded
+    //  Dummy read to be discarded - to be checked on Datasheet
     if (lis2dw12_read(&lis2dw12, &acc_x, &acc_y, &acc_z, &acc_t) != LIS2DW12_OK) {
         puts("[SENSOR lis2dw12] READ FAILED.");
         return;
@@ -268,8 +268,8 @@ void sensor_read(void)
     (*sensor_read_ptr)();
 
     //  Switch off sensor
-    gpio_clear(LIS2DW12_POWER_PIN);
-    
+    gpio_clear(SENSOR_POWER_PIN- );
+
     //  Report packet - info
     //  Header
     format_header_info(false, infomsg);
