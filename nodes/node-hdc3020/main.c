@@ -45,6 +45,7 @@ static lora_state_t lora;
 #define NODE_PACKET_SIZE        NODE_HDC3020_SIZE
 #define NODE_CLASS              NODE_HDC3020_CLASS
 #define USES_FRAM               0
+#define SENSOR_POWER_PIN        HDC3020_ENABLE_PIN
 
 //  Variables
 static hdc3020_t hdc3020;
@@ -55,14 +56,14 @@ static node_hdc3020 node_data;
 //  Read Sensor
 void hdc3020_sensor_read(void);
 //  Format Sensor Data
-void format_lis2dw12_info(int bln_hex, char *msg);
+void format_hdc3020_info(int bln_hex, char *msg);
 
 //  Sensor specific functions pointers
 //
 //  Read Sensor
 void (*sensor_read_ptr)(void) = &hdc3020_sensor_read;
 //  Format Sensor Data
-void (*format_info_ptr)(int, char *) = &format_lis2dw12_info;
+void (*format_info_ptr)(int, char *) = &format_hdc3020_info;
 
 
 
@@ -242,6 +243,9 @@ void sensor_read(void)
 
     //  Read data from sensor
     (*sensor_read_ptr)();
+
+    //  Switch off sensor
+    gpio_clear(SENSOR_POWER_PIN);
 
     //  Report packet - info
     //  Header
