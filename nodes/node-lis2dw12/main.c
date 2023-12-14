@@ -328,7 +328,7 @@ int main(void)
         lora_off();
         printf("\n");
         printf("-------------------------------------\n");
-        printf("-       Test Node-AT Berta-H10      -\n");
+        printf("-    Test Node-LIS2DW12 Berta-H10   -\n");
         printf("-           by Acme Systems         -\n");
         printf("-  Version  : %s              -\n", FW_VERSION);
         printf("-  Compiled : %s %s  -\n", __DATE__, __TIME__);
