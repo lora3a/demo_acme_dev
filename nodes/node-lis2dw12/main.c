@@ -49,6 +49,7 @@ static h10_adc_t h10_adc_dev;
 #define NODE_CLASS              NODE_LIS2DW12_CLASS
 #define SCALE_ACCELEROMETER     1.0
 #define USES_FRAM               0
+#define SENSOR_POWER_PIN        LIS2DW12_POWER_PIN
 
 //  Variables
 static lis2dw12_t lis2dw12;
@@ -80,7 +81,15 @@ void lis2dw12_sensor_read(void)
         puts("[SENSOR lis2dw12] INIT FAILED.");
         return;
     }
+    ztimer_sleep(ZTIMER_MSEC, 20);
 
+    //  Dummy read to be discarded
+    if (lis2dw12_read(&lis2dw12, &acc_x, &acc_y, &acc_z, &acc_t) != LIS2DW12_OK) {
+        puts("[SENSOR lis2dw12] READ FAILED.");
+        return;
+    }
+ 
+    //ztimer_sleep(ZTIMER_MSEC, 200);
     if (lis2dw12_read(&lis2dw12, &acc_x, &acc_y, &acc_z, &acc_t) != LIS2DW12_OK) {
         puts("[SENSOR lis2dw12] READ FAILED.");
         return;
@@ -258,6 +267,9 @@ void sensor_read(void)
     //  Read data from sensor
     (*sensor_read_ptr)();
 
+    //  Switch off sensor
+    gpio_clear(LIS2DW12_POWER_PIN);
+    
     //  Report packet - info
     //  Header
     format_header_info(false, infomsg);
@@ -341,12 +353,14 @@ int main(void)
         if (SLEEP_TIME > -1) {
             printf("Periodic task running every %d seconds.\n", SLEEP_TIME);
         }
+
         report_lora_setup();
         sensor_read();
         break;
     }
 
     puts("Entering backup mode.");
+    
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;
