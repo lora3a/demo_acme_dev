@@ -103,6 +103,18 @@ typedef struct node_bme688 node_bme688;
 #define NODE_BME688_SIZE sizeof(node_bme688)
 
 //
+struct node_ds118b20 {
+    node_header header;
+
+    int16_t temperature;
+};
+
+typedef struct node_ds18b20 node_ds18b20;
+#define NODE_DS18B20_CLASS 7
+#define NODE_DS18B20_SIZE sizeof(node_ds18b20)
+
+
+//
 struct gateway_data {
     int16_t rssi;
     int8_t snr;
@@ -114,10 +126,11 @@ typedef struct gateway_data gateway_data;
 //
 const char *CLASS_LIST[] = {
     "NO SENSOR",
-    "Umidity + Temperature",
-    "Acceleration + Temperature",
+    "Node HDC3020 Humidity + Temperature",
+    "Node LIS2DW12 Acceleration + Temperature",
     "Node SENSEAIR CO2 + Temperature",
     "Time of Flight",
-    "Ciccio me tocca",
-    "Node BME688 Temp + Hum + Press + Gas"
+    "Node LIS2DW12 Ciccio me tocca",
+    "Node BME688 Temp + Hum + Press + Gas",
+    "Node DS18B20 Temperature"
 };
