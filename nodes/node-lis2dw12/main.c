@@ -111,9 +111,9 @@ void lis2dw12_sensor_read(void)
     node_data.acc_y = (int16_t)(acc.y_mg * SCALE_ACCELEROMETER);
     node_data.acc_z = (int16_t)(acc.z_mg * SCALE_ACCELEROMETER);
     node_data.temperature = (int16_t)(acc.t_c * 100.);
-    node_data.pitch = rot_matrix.pitch;
-    node_data.roll = rot_matrix.roll;
-    node_data.yaw = rot_matrix.yaw;
+    node_data.pitch = (int16_t)(rot_matrix.pitch * 100);
+    node_data.roll = (int16_t)(rot_matrix.roll * 100);
+    node_data.yaw = (int16_t)(rot_matrix.yaw * 100);
 }
 
 //  Format Sensor Data
