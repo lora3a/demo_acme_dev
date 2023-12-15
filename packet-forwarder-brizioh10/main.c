@@ -150,6 +150,24 @@ void setNumericJnode(char *name, int value, char *jnode)
 }
 
 //
+//	Converts the info part of the binary array in a json formatted string specifically for DS18B20 Nodes
+//
+void binary_to_json_ds18b20(const char *message, char *json)
+{
+    char *p = (char *)message;
+    char strFmt[10];
+    int16_t temperature;
+
+    p += NODE_HEADER_SIZE;
+    temperature = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
+    printf("temperature   : %s\n", strFmt);
+    setNumericStringJnode("temperature", strFmt, jNode);
+    strcat(json, jNode);
+ 
+}
+
+//
 //	Converts the info part of the binary array in a json formatted string specifically for SENSEAIR Nodes
 //
 void binary_to_json_senseair(const char *message, char *json)
@@ -489,6 +507,11 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 res = TRUE;
                 d_size = NODE_BME688_SIZE;
                 break;
+            case NODE_DS18B20_CLASS:
+                res = TRUE;
+                d_size = NODE_DS18B20_SIZE;
+                break;
+
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
@@ -534,6 +557,10 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             case NODE_BME688_CLASS:
                 binary_to_json_bme688(message, strJasonMsg);
                 break;
+            case NODE_DS18B20_CLASS:
+                binary_to_json_ds18b20(message, strJasonMsg);
+                break;
+
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
