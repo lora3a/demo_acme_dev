@@ -268,7 +268,7 @@ void sensor_read(void)
     (*sensor_read_ptr)();
 
     //  Switch off sensor
-    gpio_clear(SENSOR_POWER_PIN- );
+    gpio_clear(SENSOR_POWER_PIN);
 
     //  Report packet - info
     //  Header
