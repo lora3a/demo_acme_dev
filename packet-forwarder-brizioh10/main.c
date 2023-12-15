@@ -179,40 +179,64 @@ void binary_to_json_senseair(const char *message, char *json)
 //
 void binary_to_json_lis2dw12(const char *message, char *json)
 {
-    char *p = (char *)message;
-    char strFmt[10];
-    int16_t acc_x;
-    int16_t acc_y;
-    int16_t acc_z;
-    int16_t temperature;
+char *p = (char *)message;
+char strFmt[10];
+int16_t acc_x;
+int16_t acc_y;
+int16_t acc_z;
+int16_t temperature;
+int16_t pitch;
+int16_t roll;
+int16_t yaw;
 
-    p += NODE_HEADER_SIZE;
-    acc_x = int16(p);
-    sprintf(strFmt, "%5d", acc_x);
-    printf("acc_x         : %s\n", strFmt);
-    setNumericStringJnode("acc_x", strFmt, jNode);
-    strcat(json, jNode);
+	p+=NODE_HEADER_SIZE;
+	acc_x = int16(p);
+	sprintf(strFmt,"%5d",acc_x);
+	printf("acc_x         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_x",strFmt, jNode);
+	strcat(json,jNode);
 
-    p += 2;
-    acc_y = int16(p);
-    sprintf(strFmt, "%5d", acc_y);
-    printf("acc_y         : %s\n", strFmt);
-    setNumericStringJnode("acc_y", strFmt, jNode);
-    strcat(json, jNode);
+	p+=2;
+	acc_y = int16(p);
+	sprintf(strFmt,"%5d",acc_y);
+	printf("acc_y         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_y",strFmt, jNode);
+	strcat(json,jNode);
 
-    p += 2;
-    acc_z = int16(p);
-    sprintf(strFmt, "%5d", acc_z);
-    printf("acc_z         : %s\n", strFmt);
-    setNumericStringJnode("acc_z", strFmt, jNode);
-    strcat(json, jNode);
+	p+=2;
+	acc_z = int16(p);
+	sprintf(strFmt,"%5d",acc_z);
+	printf("acc_z         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_z",strFmt, jNode);
+	strcat(json,jNode);
 
-    p += 2;
-    temperature = int16(p);
-    sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
-    printf("temperature   : %s\n", strFmt);
-    setNumericStringJnode("temperature", strFmt, jNode);
-    strcat(json, jNode);
+	p+=2;
+	temperature = int16(p);
+	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
+	printf("temperature   : %s\n",strFmt) ;
+	setNumericStringJnode("temperature",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	pitch = int16(p);
+	sprintf(strFmt,"%6.2f",((double)pitch)/100.);
+	printf("pitch         : %s\n",strFmt) ;
+	setNumericStringJnode("pitch",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	roll = int16(p);
+	sprintf(strFmt,"%6.2f",((double)roll)/100.);
+	printf("roll          : %s\n",strFmt) ;
+	setNumericStringJnode("roll",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	yaw = int16(p);
+	sprintf(strFmt,"%6.2f",((double)yaw)/100.);
+	printf("yaw          : %s\n",strFmt) ;
+	setNumericStringJnode("yaw",strFmt, jNode);
+	strcat(json,jNode);
 
 }
 
