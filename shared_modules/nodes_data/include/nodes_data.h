@@ -48,6 +48,9 @@ struct node_lis2dw12 {
     int16_t acc_y;
     int16_t acc_z;
     int16_t temperature;
+    int16_t pitch;
+    int16_t roll;
+    int16_t yaw;
 };
 
 typedef struct node_lis2dw12 node_lis2dw12;

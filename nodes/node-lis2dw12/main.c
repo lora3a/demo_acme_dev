@@ -43,6 +43,7 @@ static h10_adc_t h10_adc_dev;
 //  Includes
 #include "lis2dw12.h"
 #include "lis2dw12_params.h"
+#include "lis2dw12_util.h"
 
 //  Defines
 #define NODE_PACKET_SIZE        NODE_LIS2DW12_SIZE
@@ -54,6 +55,8 @@ static h10_adc_t h10_adc_dev;
 //  Variables
 static lis2dw12_t lis2dw12;
 static node_lis2dw12 node_data;
+static accelerometer acc;
+static rotation_matrix rot_matrix;
 
 //  Sensor specific functions declaration
 //
@@ -75,8 +78,6 @@ void (*format_info_ptr)(int, char *) = &format_lis2dw12_info;
 //  Read Sensor
 void lis2dw12_sensor_read(void)
 {
-    float acc_x, acc_y, acc_z, acc_t;
-
     if (lis2dw12_init(&lis2dw12, &lis2dw12_params[0]) != LIS2DW12_OK) {
         puts("[SENSOR lis2dw12] INIT FAILED.");
         return;
@@ -84,26 +85,35 @@ void lis2dw12_sensor_read(void)
     ztimer_sleep(ZTIMER_MSEC, 20);
 
     //  Dummy read to be discarded - to be checked on Datasheet
-    if (lis2dw12_read(&lis2dw12, &acc_x, &acc_y, &acc_z, &acc_t) != LIS2DW12_OK) {
+    if (lis2dw12_read(&lis2dw12, &acc.x_mg, &acc.y_mg, &acc.z_mg, &acc.t_c) != LIS2DW12_OK) {
         puts("[SENSOR lis2dw12] READ FAILED.");
         return;
     }
- 
+
     //ztimer_sleep(ZTIMER_MSEC, 200);
-    if (lis2dw12_read(&lis2dw12, &acc_x, &acc_y, &acc_z, &acc_t) != LIS2DW12_OK) {
+    if (lis2dw12_read(&lis2dw12, &acc.x_mg, &acc.y_mg, &acc.z_mg, &acc.t_c) != LIS2DW12_OK) {
         puts("[SENSOR lis2dw12] READ FAILED.");
         return;
     }
+
+    float g_total = accelerometer_magnitude(&acc);
+
+    calculate_rotation(&rot_matrix, &acc, g_total);
 
     printf(
         "[SENSOR Data] X: %.3f, Y: %.3f, Z: %.3f, TEMP: %.2f\n",
-        acc_x, acc_y, acc_z,
-        acc_t);
+        acc.x_mg, acc.y_mg, acc.z_mg,
+        acc.t_c);
 
-    node_data.acc_x = (int16_t)(acc_x * SCALE_ACCELEROMETER);
-    node_data.acc_y = (int16_t)(acc_y * SCALE_ACCELEROMETER);
-    node_data.acc_z = (int16_t)(acc_z * SCALE_ACCELEROMETER);
-    node_data.temperature = (int16_t)(acc_t * 100.);
+    rotation_matrix_print(&rot_matrix);
+
+    node_data.acc_x = (int16_t)(acc.x_mg * SCALE_ACCELEROMETER);
+    node_data.acc_y = (int16_t)(acc.y_mg * SCALE_ACCELEROMETER);
+    node_data.acc_z = (int16_t)(acc.z_mg * SCALE_ACCELEROMETER);
+    node_data.temperature = (int16_t)(acc.t_c * 100.);
+    node_data.pitch = rot_matrix.pitch;
+    node_data.roll = rot_matrix.roll;
+    node_data.yaw = rot_matrix.yaw;
 }
 
 //  Format Sensor Data
@@ -112,14 +122,16 @@ void format_lis2dw12_info(int bln_hex, char *msg)
 
     if (bln_hex) {
         sprintf(msg,
-                "ACC X: %04X, ACC Y: %04X, ACC Z: %4X, TEMP: %04X",
-                node_data.acc_x, node_data.acc_y, node_data.acc_z, node_data.temperature
+                "ACC X: %04X, ACC Y: %04X, ACC Z: %4X, TEMP: %04X, PITCH: %04X, ROLL: %04X, YAW: %04X",
+                node_data.acc_x, node_data.acc_y, node_data.acc_z, node_data.temperature,
+                node_data.pitch, node_data.roll, node_data.yaw
                 );
     }
     else {
         sprintf(msg,
-                "ACC X: %05d, ACC Y: %05d, ACC Z: %5d, TEMP: %05d",
-                node_data.acc_x, node_data.acc_y, node_data.acc_z, node_data.temperature
+                "ACC X: %05d, ACC Y: %05d, ACC Z: %5d, TEMP: %05d, PITCH: % 3.2f, ROLL: % 3.2f, YAW: % 3.2f",
+                node_data.acc_x, node_data.acc_y, node_data.acc_z, node_data.temperature,
+                node_data.pitch / 100., node_data.roll / 100., node_data.yaw / 100.
                 );
     }
 }
@@ -360,7 +372,7 @@ int main(void)
     }
 
     puts("Entering backup mode.");
-    
+
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;
