@@ -106,7 +106,7 @@ typedef struct node_bme688 node_bme688;
 #define NODE_BME688_SIZE sizeof(node_bme688)
 
 //
-struct node_ds118b20 {
+struct node_ds18b20 {
     node_header header;
 
     int16_t temperature;
