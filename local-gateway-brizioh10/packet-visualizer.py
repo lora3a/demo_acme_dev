@@ -54,7 +54,7 @@ def report_lis2dw12_node(dictH10):
 	if "acc_x" in dictH10:
 		print("acc_z       : %d" % dictH10["acc_z"])
 	if "temperature" in dictH10:
-		print("temperature : %d" % dictH10["temperature"])
+		print("temperature : %5.2f" % dictH10["temperature"])
 	if "pitch" in dictH10:
 		print("pitch       : %5.2f" % dictH10["pitch"])
 	if "roll" in dictH10:
@@ -62,7 +62,7 @@ def report_lis2dw12_node(dictH10):
 	if "yaw" in dictH10:
 		print("yaw         : %5.2f" % dictH10["yaw"])
 		
-def report_ht_node(dictH10, cfg_dict):
+def report_hdc3020_node(dictH10, cfg_dict):
 	lcd_stringT = ""
 	lcd_stringH = ""
 	lcd_string = ""
@@ -132,6 +132,24 @@ def report_no_sensor_node(dictH10, cfg_dict):
 	return retblnAlert
 
 
+def report_lis2dw12_ds18b20_node(dictH10):
+	if "acc_x" in dictH10:
+		print("acc_x       : %d" % dictH10["acc_x"])
+	if "acc_y" in dictH10:
+		print("acc_y       : %d" % dictH10["acc_y"])
+	if "acc_x" in dictH10:
+		print("acc_z       : %d" % dictH10["acc_z"])
+	if "temp_lis2dw12" in dictH10:
+		print("tem_lis2dw12: %5.2f" % dictH10["temp_lis2dw12"])
+	if "pitch" in dictH10:
+		print("pitch       : %5.2f" % dictH10["pitch"])
+	if "roll" in dictH10:
+		print("roll        : %5.2f" % dictH10["roll"])
+	if "yaw" in dictH10:
+		print("yaw         : %5.2f" % dictH10["yaw"])
+	if "temp_ds18b20" in dictH10:
+		print("tem_ds18b20 : %5.2f" % dictH10["temp_ds18b20"])
+
 def report_node_header(dictH10):
 
 	if "rssi" in dictH10:
@@ -160,13 +178,14 @@ def report_node_type(strjson, cfg_dict):
 	
 	nodeclass = {
 		"0"  : "NO Sensor",
-		"1"  : "HDC3020  - Humidity Temperature",
-		"2"  : "LIS2DW12 - Accelerometer Temperature",
-		"3"  : "SENSEAIR - CO2 Temperature",
+		"1"  : "HDC3020  - Hum + Temp",
+		"2"  : "LIS2DW12 - Acc + Incl + Temp",
+		"3"  : "SENSEAIR - CO2 + Temp",
 		"4"  : "D",
 		"5"  : "CiccioMeTocca",
-		"6"  : "BME688   - Humidity Temperature Pressure Gas",
-		"7"  : "DS18B20  - Temperature"
+		"6"  : "BME688   - Hum + Temp + Press + Gas",
+		"7"  : "DS18B20  - Temp",
+		"8"  : "LIS2DW12-DS18B20 - Acc + Incl + Temp + Temp"
 	}
 	dictH10 = dict()
 	lensj = len(strjson)
@@ -182,7 +201,7 @@ def report_node_type(strjson, cfg_dict):
 		dictH10 = json.loads(strjson)
 		if "s_class" in dictH10:
 			s_class = dictH10["s_class"]
-			if((s_class>=0)and(s_class<=7)):
+			if((s_class>=0)and(s_class<len(nodeclass))):
 				s_strclass = "{0:d}".format(s_class)
 				strclass = nodeclass[s_strclass]
 				print('{0:s} Node {1:s}'.format(strclass, s_time))
@@ -204,6 +223,8 @@ def report_node_type(strjson, cfg_dict):
 						report_bme688_node(dictH10, cfg_dict)
 					case 7:
 						report_ds18b20_node(dictH10)
+					case 8:
+						report_lis2dw12_ds18b20_node(dictH10)						
 					case _:
 						print('UNKOWN Node {0:s}'.format(s_time))
 			else:
