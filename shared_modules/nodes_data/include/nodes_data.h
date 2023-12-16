@@ -131,8 +131,8 @@ struct node_lis2dw12_ds18b20 {
 };
 
 typedef struct node_lis2dw12_ds18b20 node_lis2dw12_ds18b20;
-#define NODE_LIS2DW12_CLASS 8
-#define NODE_LIS2DW12_SIZE sizeof(node_lis2dw12_ds18b20)
+#define NODE_LIS2DW12_DS18B20_CLASS 8
+#define NODE_LIS2DW12_DS18B20_SIZE sizeof(node_lis2dw12_ds18b20)
 
 //
 struct gateway_data {
