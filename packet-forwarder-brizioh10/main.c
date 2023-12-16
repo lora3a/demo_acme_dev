@@ -193,7 +193,7 @@ void binary_to_json_senseair(const char *message, char *json)
 }
 
 //
-//	Converts the info part of the binary array in a json formatted string specifically for AT Nodes
+//	Converts the info part of the binary array in a json formatted string specifically for lis2dw12 Nodes
 //
 void binary_to_json_lis2dw12(const char *message, char *json)
 {
@@ -260,7 +260,7 @@ int16_t yaw;
 
 
 //
-//	Converts the info part of the binary array in a json formatted string specifically for HT Nodes
+//	Converts the info part of the binary array in a json formatted string specifically for hdc3020 Nodes
 //
 void binary_to_json_hdc3020(const char *message, char *json)
 {
@@ -291,7 +291,7 @@ void binary_to_json_hdc3020(const char *message, char *json)
 
 
 //
-//	Converts the info part of the binary array in a json formatted string specifically for CMT Nodes
+//	Converts the info part of the binary array in a json formatted string specifically for lis2dw12_cmt Nodes
 //
 void binary_to_json_lis2dw12_cmt(const char *message, char *json)
 {
@@ -308,7 +308,7 @@ void binary_to_json_lis2dw12_cmt(const char *message, char *json)
 }
 
 //
-//	Converts the info part of the binary array in a json formatted string specifically for CMT Nodes
+//	Converts the info part of the binary array in a json formatted string specifically for bme688 Nodes
 //
 void binary_to_json_bme688(const char *message, char *json)
 {
@@ -345,7 +345,7 @@ void binary_to_json_bme688(const char *message, char *json)
     strcat(json, jNode);
 
 
-    //  Solve structure allignement +4 instead of +22
+    //  Solve structure allignement +4 instead of +2
     p += 4;
     gas = uint32(p);
     sprintf(strFmt, "%ld", gas);
@@ -354,7 +354,76 @@ void binary_to_json_bme688(const char *message, char *json)
     strcat(json, jNode);
 }
 
+//	Converts the info part of the binary array in a json formatted string specifically for lis2dw12_ds18b20 Nodes
+//
+void binary_to_json_lis2dw12_ds18b20(const char *message, char *json)
+{
+char *p = (char *)message;
+char strFmt[10];
+int16_t acc_x;
+int16_t acc_y;
+int16_t acc_z;
+int16_t temperature;
+int16_t pitch;
+int16_t roll;
+int16_t yaw;
 
+	p+=NODE_HEADER_SIZE;
+	acc_x = int16(p);
+	sprintf(strFmt,"%5d",acc_x);
+	printf("acc_x         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_x",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	acc_y = int16(p);
+	sprintf(strFmt,"%5d",acc_y);
+	printf("acc_y         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_y",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	acc_z = int16(p);
+	sprintf(strFmt,"%5d",acc_z);
+	printf("acc_z         : %s\n",strFmt) ;
+	setNumericStringJnode("acc_z",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	temperature = int16(p);
+	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
+	printf("temp_lis2dw12 : %s\n",strFmt) ;
+	setNumericStringJnode("temp_lis2dw12",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	pitch = int16(p);
+	sprintf(strFmt,"%6.2f",((double)pitch)/100.);
+	printf("pitch         : %s\n",strFmt) ;
+	setNumericStringJnode("pitch",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	roll = int16(p);
+	sprintf(strFmt,"%6.2f",((double)roll)/100.);
+	printf("roll          : %s\n",strFmt) ;
+	setNumericStringJnode("roll",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	yaw = int16(p);
+	sprintf(strFmt,"%6.2f",((double)yaw)/100.);
+	printf("yaw           : %s\n",strFmt) ;
+	setNumericStringJnode("yaw",strFmt, jNode);
+	strcat(json,jNode);
+
+	p+=2;
+	temperature = int16(p);
+	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
+	printf("temp_ds18b20  : %s\n",strFmt) ;
+	setNumericStringJnode("temp_ds18b20",strFmt, jNode);
+	strcat(json,jNode);
+}
 
 //
 //	Converts the binary data of unknown origin in a json formatted string blob
@@ -511,7 +580,10 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 res = TRUE;
                 d_size = NODE_DS18B20_SIZE;
                 break;
-
+            case NODE_LIS2DW12_DS18B20_CLASS:
+                res = TRUE;
+                d_size = NODE_LIS2DW12_DS18B20_SIZE;
+                break;
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
                 res = FALSE;
@@ -524,7 +596,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     else {
         printf("Wrong Signature, Blob Packet Sent!\n");
     }
-
+    
     if (res) {
         printf("Sensors       : %s\n", CLASS_LIST[s_class]);
         if (d_size == len) {
@@ -559,6 +631,9 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
                 break;
             case NODE_DS18B20_CLASS:
                 binary_to_json_ds18b20(message, strJasonMsg);
+                break;
+            case NODE_LIS2DW12_DS18B20_CLASS:
+                binary_to_json_lis2dw12_ds18b20(message, strJasonMsg);
                 break;
 
             default:
