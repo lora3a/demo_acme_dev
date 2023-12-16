@@ -146,12 +146,12 @@ typedef struct gateway_data gateway_data;
 //
 const char *CLASS_LIST[] = {
     "NO SENSOR",
-    "Node HDC3020 Humidity + Temperature",
-    "Node LIS2DW12 Acceleration + Inclinometer + Temperature",
-    "Node SENSEAIR CO2 + Temperature",
+    "HDC3020 Hum + Temp",
+    "LIS2DW12 Acc + Incl + Temp",
+    "SENSEAIR CO2 + Temp",
     "Time of Flight",
-    "Node LIS2DW12 Ciccio me tocca",
-    "Node BME688 Temp + Hum + Press + Gas",
-    "Node DS18B20 Temperature"
-    "Node LIS2DW12 - DS18B20 Acceleration + Temperature + Inclinometer + Temperature",
+    "LIS2DW12 Ciccio me tocca",
+    "BME688 Temp + Hum + Press + Gas",
+    "DS18B20 Temp",
+    "LIS2DW12 - DS18B20 Acc + Temp + Incl + Temp"
 };
