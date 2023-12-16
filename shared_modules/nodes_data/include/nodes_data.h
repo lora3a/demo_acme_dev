@@ -116,6 +116,23 @@ typedef struct node_ds18b20 node_ds18b20;
 #define NODE_DS18B20_CLASS 7
 #define NODE_DS18B20_SIZE sizeof(node_ds18b20)
 
+//
+struct node_lis2dw12_ds18b20 {
+    node_header header;
+
+    int16_t acc_x;
+    int16_t acc_y;
+    int16_t acc_z;
+    int16_t temp_lis2dw12;
+    int16_t pitch;
+    int16_t roll;
+    int16_t yaw;
+    int16_t temp_ds18b20;
+};
+
+typedef struct node_lis2dw12_ds18b20 node_lis2dw12_ds18b20;
+#define NODE_LIS2DW12_CLASS 8
+#define NODE_LIS2DW12_SIZE sizeof(node_lis2dw12_ds18b20)
 
 //
 struct gateway_data {
@@ -130,10 +147,11 @@ typedef struct gateway_data gateway_data;
 const char *CLASS_LIST[] = {
     "NO SENSOR",
     "Node HDC3020 Humidity + Temperature",
-    "Node LIS2DW12 Acceleration + Temperature",
+    "Node LIS2DW12 Acceleration + Inclinometer + Temperature",
     "Node SENSEAIR CO2 + Temperature",
     "Time of Flight",
     "Node LIS2DW12 Ciccio me tocca",
     "Node BME688 Temp + Hum + Press + Gas",
     "Node DS18B20 Temperature"
+    "Node LIS2DW12 - DS18B20 Acceleration + Temperature + Inclinometer + Temperature",
 };
