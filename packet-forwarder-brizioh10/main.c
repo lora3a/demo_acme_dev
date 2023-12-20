@@ -31,13 +31,8 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-
-#define UART_PORT           UART_DEV(1)
-#define UART_SPEED          115200UL
-#define UART_BUF_SIZE       (128U)
-
 typedef struct {
-    char rx_mem[UART_BUF_SIZE];
+    char rx_mem[BRIZIO_UART_BUF_SIZE];
     ringbuffer_t rx_buf;
 } uart_ctx_t;
 
@@ -164,7 +159,7 @@ void binary_to_json_ds18b20(const char *message, char *json)
     printf("temperature   : %s\n", strFmt);
     setNumericStringJnode("temperature", strFmt, jNode);
     strcat(json, jNode);
- 
+
 }
 
 //
@@ -197,64 +192,64 @@ void binary_to_json_senseair(const char *message, char *json)
 //
 void binary_to_json_lis2dw12(const char *message, char *json)
 {
-char *p = (char *)message;
-char strFmt[10];
-int16_t acc_x;
-int16_t acc_y;
-int16_t acc_z;
-int16_t temperature;
-int16_t pitch;
-int16_t roll;
-int16_t yaw;
+    char *p = (char *)message;
+    char strFmt[10];
+    int16_t acc_x;
+    int16_t acc_y;
+    int16_t acc_z;
+    int16_t temperature;
+    int16_t pitch;
+    int16_t roll;
+    int16_t yaw;
 
-	p+=NODE_HEADER_SIZE;
-	acc_x = int16(p);
-	sprintf(strFmt,"%5d",acc_x);
-	printf("acc_x         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_x",strFmt, jNode);
-	strcat(json,jNode);
+    p += NODE_HEADER_SIZE;
+    acc_x = int16(p);
+    sprintf(strFmt, "%5d", acc_x);
+    printf("acc_x         : %s\n", strFmt);
+    setNumericStringJnode("acc_x", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	acc_y = int16(p);
-	sprintf(strFmt,"%5d",acc_y);
-	printf("acc_y         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_y",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    acc_y = int16(p);
+    sprintf(strFmt, "%5d", acc_y);
+    printf("acc_y         : %s\n", strFmt);
+    setNumericStringJnode("acc_y", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	acc_z = int16(p);
-	sprintf(strFmt,"%5d",acc_z);
-	printf("acc_z         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_z",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    acc_z = int16(p);
+    sprintf(strFmt, "%5d", acc_z);
+    printf("acc_z         : %s\n", strFmt);
+    setNumericStringJnode("acc_z", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	temperature = int16(p);
-	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
-	printf("temperature   : %s\n",strFmt) ;
-	setNumericStringJnode("temperature",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    temperature = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
+    printf("temperature   : %s\n", strFmt);
+    setNumericStringJnode("temperature", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	pitch = int16(p);
-	sprintf(strFmt,"%6.2f",((double)pitch)/100.);
-	printf("pitch         : %s\n",strFmt) ;
-	setNumericStringJnode("pitch",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    pitch = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)pitch) / 100.);
+    printf("pitch         : %s\n", strFmt);
+    setNumericStringJnode("pitch", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	roll = int16(p);
-	sprintf(strFmt,"%6.2f",((double)roll)/100.);
-	printf("roll          : %s\n",strFmt) ;
-	setNumericStringJnode("roll",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    roll = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)roll) / 100.);
+    printf("roll          : %s\n", strFmt);
+    setNumericStringJnode("roll", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	yaw = int16(p);
-	sprintf(strFmt,"%6.2f",((double)yaw)/100.);
-	printf("yaw          : %s\n",strFmt) ;
-	setNumericStringJnode("yaw",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    yaw = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)yaw) / 100.);
+    printf("yaw          : %s\n", strFmt);
+    setNumericStringJnode("yaw", strFmt, jNode);
+    strcat(json, jNode);
 
 }
 
@@ -358,71 +353,71 @@ void binary_to_json_bme688(const char *message, char *json)
 //
 void binary_to_json_lis2dw12_ds18b20(const char *message, char *json)
 {
-char *p = (char *)message;
-char strFmt[10];
-int16_t acc_x;
-int16_t acc_y;
-int16_t acc_z;
-int16_t temperature;
-int16_t pitch;
-int16_t roll;
-int16_t yaw;
+    char *p = (char *)message;
+    char strFmt[10];
+    int16_t acc_x;
+    int16_t acc_y;
+    int16_t acc_z;
+    int16_t temperature;
+    int16_t pitch;
+    int16_t roll;
+    int16_t yaw;
 
-	p+=NODE_HEADER_SIZE;
-	acc_x = int16(p);
-	sprintf(strFmt,"%5d",acc_x);
-	printf("acc_x         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_x",strFmt, jNode);
-	strcat(json,jNode);
+    p += NODE_HEADER_SIZE;
+    acc_x = int16(p);
+    sprintf(strFmt, "%5d", acc_x);
+    printf("acc_x         : %s\n", strFmt);
+    setNumericStringJnode("acc_x", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	acc_y = int16(p);
-	sprintf(strFmt,"%5d",acc_y);
-	printf("acc_y         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_y",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    acc_y = int16(p);
+    sprintf(strFmt, "%5d", acc_y);
+    printf("acc_y         : %s\n", strFmt);
+    setNumericStringJnode("acc_y", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	acc_z = int16(p);
-	sprintf(strFmt,"%5d",acc_z);
-	printf("acc_z         : %s\n",strFmt) ;
-	setNumericStringJnode("acc_z",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    acc_z = int16(p);
+    sprintf(strFmt, "%5d", acc_z);
+    printf("acc_z         : %s\n", strFmt);
+    setNumericStringJnode("acc_z", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	temperature = int16(p);
-	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
-	printf("temp_lis2dw12 : %s\n",strFmt) ;
-	setNumericStringJnode("temp_lis2dw12",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    temperature = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
+    printf("temp_lis2dw12 : %s\n", strFmt);
+    setNumericStringJnode("temp_lis2dw12", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	pitch = int16(p);
-	sprintf(strFmt,"%6.2f",((double)pitch)/100.);
-	printf("pitch         : %s\n",strFmt) ;
-	setNumericStringJnode("pitch",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    pitch = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)pitch) / 100.);
+    printf("pitch         : %s\n", strFmt);
+    setNumericStringJnode("pitch", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	roll = int16(p);
-	sprintf(strFmt,"%6.2f",((double)roll)/100.);
-	printf("roll          : %s\n",strFmt) ;
-	setNumericStringJnode("roll",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    roll = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)roll) / 100.);
+    printf("roll          : %s\n", strFmt);
+    setNumericStringJnode("roll", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	yaw = int16(p);
-	sprintf(strFmt,"%6.2f",((double)yaw)/100.);
-	printf("yaw           : %s\n",strFmt) ;
-	setNumericStringJnode("yaw",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    yaw = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)yaw) / 100.);
+    printf("yaw           : %s\n", strFmt);
+    setNumericStringJnode("yaw", strFmt, jNode);
+    strcat(json, jNode);
 
-	p+=2;
-	temperature = int16(p);
-	sprintf(strFmt,"%6.2f",((double)temperature)/100.);
-	printf("temp_ds18b20  : %s\n",strFmt) ;
-	setNumericStringJnode("temp_ds18b20",strFmt, jNode);
-	strcat(json,jNode);
+    p += 2;
+    temperature = int16(p);
+    sprintf(strFmt, "%6.2f", ((double)temperature) / 100.);
+    printf("temp_ds18b20  : %s\n", strFmt);
+    setNumericStringJnode("temp_ds18b20", strFmt, jNode);
+    strcat(json, jNode);
 }
 
 //
@@ -596,7 +591,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     else {
         printf("Wrong Signature, Blob Packet Sent!\n");
     }
-    
+
     if (res) {
         printf("Sensors       : %s\n", CLASS_LIST[s_class]);
         if (d_size == len) {
@@ -662,13 +657,14 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     strJasonMsg[strlen(strJasonMsg) - 1] = '}';
     strJasonMsg[strlen(strJasonMsg)] = '\n';
     printf("%s\n", strJasonMsg);
-    uart_write(UART_PORT, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
+    uart_write(BRIZIO_UART_PORT, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
     xtimer_usleep(5000);
 
     gpio_write(GPIO_PIN(PA, 27), 1);
 
 
 }
+
 void report_lora_setup(void)
 {
 
@@ -680,6 +676,7 @@ void report_lora_setup(void)
     printf("LORA.BS %d\n", DEFAULT_LORA_BOOST);
 
 }
+
 int main(void)
 {
     lora_state_t lora;
@@ -694,11 +691,11 @@ int main(void)
     printf("-------------------------------------\n\n");
 
     //	Init uart rx ringbuffer
-    ringbuffer_init(&u_ctx.rx_buf, u_ctx.rx_mem, UART_BUF_SIZE);
+    ringbuffer_init(&u_ctx.rx_buf, u_ctx.rx_mem, BRIZIO_UART_BUF_SIZE);
     //	Init uart, with error handling
-    res = uart_init(UART_PORT, UART_SPEED, rx_cb, NULL);
+    res = uart_init(BRIZIO_UART_PORT, BRIZIO_UART_SPEED, rx_cb, NULL);
     if (res == UART_NOBAUD) {
-        printf("Error: Given baudrate (%lu) not possible\n", UART_SPEED);
+        printf("Error: Given baudrate (%lu) not possible\n", BRIZIO_UART_SPEED);
         return 1;
     }
     else if (res != UART_OK) {
@@ -707,7 +704,7 @@ int main(void)
     }
     b_init();
 
-    printf("Success: Initialized UART at BAUD %lu\n", UART_SPEED);
+    printf("Success: Initialized UART at BAUD %lu\n", BRIZIO_UART_SPEED);
     printf("Initialization OK.\n");
 
 #if 0
@@ -717,7 +714,7 @@ int main(void)
     char message[6] = "PING.\0";
     uint8_t counter = 0;
     while (1) {
-        uart_write(UART_PORT, (uint8_t *)message, 5);
+        uart_write(BRIZIO_UART_PORT, (uint8_t *)message, 5);
         counter++;
         message[4] = (char)((counter % 10) + 0x30);
         printf("Tx >  %s \n", message);

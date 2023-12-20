@@ -1,5 +1,5 @@
 APPLICATION = packet-forwarder-brizioh10
-BOARD ?= berta-h10
+BOARD ?= brizio-h10
 
 BASE ?= $(CURDIR)/../
 LORA3ABASE ?= $(BASE)/../lora3a-boards
