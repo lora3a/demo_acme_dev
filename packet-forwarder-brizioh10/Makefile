@@ -24,8 +24,6 @@ USEMODULE += nodes_data
 
 FEATURES_REQUIRED += periph_uart
 
-CFLAGS += -DACME1_BUS_MODE=MODE_UART
-
 BW ?= 2
 CH ?= 868100000L
 ifneq ($(BW),)
