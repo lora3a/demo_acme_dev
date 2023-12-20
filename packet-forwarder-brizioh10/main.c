@@ -13,16 +13,10 @@
 #include "ringbuffer.h"
 
 #include "nodes_data.h"
+#include "utility.h"
+#include "assert.h"
 
 #define FW_VERSION "01.00.00"
-
-#ifndef FALSE
-#define FALSE   0
-#endif
-
-#ifndef TRUE
-#define TRUE    !FALSE
-#endif
 
 
 /* =========================================================== */
@@ -39,12 +33,12 @@ typedef struct {
 #define MAX_JSON_MSG_LEN 1000
 #define MAX_JSON_NODE_LEN 100
 
-char jNode[MAX_JSON_NODE_LEN];
-char cpuid_hex[CPUID_LEN * 2 + 1];
-char strJasonMsg[MAX_JSON_MSG_LEN];
-char *pstrBlob;
-int lenBlob;
-char *s_id;
+static char jNode[MAX_JSON_NODE_LEN];
+static char cpuid_hex[CPUID_LEN * 2 + 1];
+static char strJasonMsg[MAX_JSON_MSG_LEN];
+static char *pstrBlob;
+static int lenBlob;
+static char *s_id;
 
 static uart_ctx_t u_ctx;
 
@@ -56,92 +50,15 @@ static void rx_cb(void *arg, uint8_t data)
 
 void b_init(void)
 {
-    /* add pullups to UART0 pins */
-    PORT->Group[PA].PINCFG[22].bit.PULLEN = 1;
-    PORT->Group[PA].PINCFG[23].bit.PULLEN = 1;
-    gpio_init(GPIO_PIN(PA, 27), GPIO_OUT);
     //	Led Port
     int i;
 
     for (i = 0; i < 3; i++) {
-        gpio_write(GPIO_PIN(PA, 27), 0);
+        gpio_write(ACME0_POWER_PIN, 0);
         xtimer_usleep(250000);
-        gpio_write(GPIO_PIN(PA, 27), 1);
+        gpio_write(ACME0_POWER_PIN, 1);
         xtimer_usleep(250000);
     }
-
-}
-
-
-int8_t int8(const char *ptr)
-{
-    int8_t result = ptr[0];
-
-    return result;
-}
-
-
-uint8_t uint8(const char *ptr)
-{
-    uint8_t result = ptr[0];
-
-    return result;
-}
-
-uint16_t uint16(const char *ptr)
-{
-    uint16_t result = ptr[0] + (ptr[1] << 8);
-
-    return result;
-}
-
-int16_t int16(const char *ptr)
-{
-    int16_t result = ptr[0] + (ptr[1] << 8);
-
-    return result;
-}
-
-uint32_t uint32(const char *ptr)
-{
-    //printf("%2x %2x %2x  %2x\n",ptr[0],ptr[1],ptr[2],ptr[3]);
-    uint32_t result = (ptr[0] & 0x000000ff) +
-                      ((ptr[1] <<
-                        8) & 0x0000ff00) +
-                      ((ptr[2] << 16) & 0x00ff0000) + ((ptr[3] << 24) & 0xff000000);
-
-    return result;
-}
-
-
-
-
-void *combine(void *o1, size_t s1, void *o2, size_t s2)
-{
-    void *result = malloc(s1 + s2);
-
-    if (result != NULL) {
-        memcpy(result, o1, s1);
-        memcpy((result + s1), o2, s2);
-    }
-    else {
-        free(result);
-    }
-    return result;
-}
-
-void setNumericStringJnode(char *name, char *value, char *jnode)
-{
-    sprintf(jnode, "\"%s\":%s,", name, value);
-}
-
-void setStringJnode(char *name, char *value, char *jnode)
-{
-    sprintf(jnode, "\"%s\":\"%s\",", name, value);
-}
-void setNumericJnode(char *name, int value, char *jnode)
-{
-    sprintf(jnode, "\"%s\":%d,", name, value);
 }
 
 //
@@ -511,7 +428,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     char *ptr = (char *)message;
     uint16_t signature;
     uint8_t s_class;
-    int res = FALSE;
+    int res = false;
     uint8_t d_size;
     uint16_t vcc;
     uint16_t vpanel;
@@ -519,7 +436,7 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     uint8_t node_boost;
     uint16_t sleep_time;
 
-    gpio_write(GPIO_PIN(PA, 27), 0);
+    gpio_write(BRIZIO_LED_PIN, 0);
     memset(strJasonMsg, 0, sizeof(strJasonMsg));
     sprintf(strJasonMsg, "\nRx Pkt  : %u bytes, RSSI: %i, SNR: %i\n", len, *rssi, *snr);
     printf("%s", strJasonMsg);
@@ -548,40 +465,40 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
             sleep_time = uint16(ptr);
             switch (s_class) {
             case NODE_NOSENSOR_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_NOSENSOR_SIZE;
                 break;
             case NODE_HDC3020_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_HDC3020_SIZE;
                 break;
             case NODE_LIS2DW12_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_LIS2DW12_SIZE;
                 break;
             case NODE_SENSEAIR_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_SENSEAIR_SIZE;
                 break;
             case NODE_LIS2DW12_CMT_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_LIS2DW12_CMT_SIZE;
                 break;
             case NODE_BME688_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_BME688_SIZE;
                 break;
             case NODE_DS18B20_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_DS18B20_SIZE;
                 break;
             case NODE_LIS2DW12_DS18B20_CLASS:
-                res = TRUE;
+                res = true;
                 d_size = NODE_LIS2DW12_DS18B20_SIZE;
                 break;
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
-                res = FALSE;
+                res = false;
             }
         }
         else {
@@ -633,20 +550,20 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
 
             default:
                 printf("Unknown Class, Blob Packet Sent!\n");
-                res = FALSE;
+                res = false;
             }
         }
         else {
             printf("Wrong Packet Length %3d != %3d, Blob Packet Sent!\n", d_size, NODE_HEADER_SIZE);
-            res = FALSE;
+            res = false;
         }
     }
     else {
         printf("Blob Sent to Fox D27\n");
-        res = FALSE;
+        res = false;
     }
 
-    if (res != FALSE) {
+    if (res != false) {
         xtimer_usleep(5000);
     }
     else {
@@ -657,12 +574,10 @@ void dump_message(const char *message, size_t len, int16_t *rssi, int8_t *snr)
     strJasonMsg[strlen(strJasonMsg) - 1] = '}';
     strJasonMsg[strlen(strJasonMsg)] = '\n';
     printf("%s\n", strJasonMsg);
-    uart_write(BRIZIO_UART_PORT, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
+    uart_write(BRIZIO_UART_DEV, (uint8_t *)strJasonMsg, strlen(strJasonMsg));
     xtimer_usleep(5000);
 
-    gpio_write(GPIO_PIN(PA, 27), 1);
-
-
+    gpio_write(BRIZIO_LED_PIN, 1);
 }
 
 void report_lora_setup(void)
@@ -693,7 +608,7 @@ int main(void)
     //	Init uart rx ringbuffer
     ringbuffer_init(&u_ctx.rx_buf, u_ctx.rx_mem, BRIZIO_UART_BUF_SIZE);
     //	Init uart, with error handling
-    res = uart_init(BRIZIO_UART_PORT, BRIZIO_UART_SPEED, rx_cb, NULL);
+    res = uart_init(BRIZIO_UART_DEV, BRIZIO_UART_SPEED, rx_cb, NULL);
     if (res == UART_NOBAUD) {
         printf("Error: Given baudrate (%lu) not possible\n", BRIZIO_UART_SPEED);
         return 1;
@@ -714,7 +629,7 @@ int main(void)
     char message[6] = "PING.\0";
     uint8_t counter = 0;
     while (1) {
-        uart_write(BRIZIO_UART_PORT, (uint8_t *)message, 5);
+        uart_write(BRIZIO_UART_DEV, (uint8_t *)message, 5);
         counter++;
         message[4] = (char)((counter % 10) + 0x30);
         printf("Tx >  %s \n", message);
@@ -727,7 +642,7 @@ int main(void)
     //  Test Serial Rx
     //
     printf("Waiting for Data From Serial Port\n");
-    int blnLoopRx = TRUE;
+    int blnLoopRx = true;
     int c;
     char sermsg[100];
     int pos = 0;
@@ -745,7 +660,7 @@ int main(void)
             }
             else {
                 // Time Out
-                blnLoopRx = FALSE;
+                blnLoopRx = false;
                 printf("Serial Port T.O.\n");
             }
         }
@@ -770,9 +685,9 @@ int main(void)
     //  Test Led
     //
     while (1) {
-        gpio_write(GPIO_PIN(PA, 27), 1);
+        gpio_write(BRIZIO_LED_PIN, 1);
         xtimer_usleep(250000);
-        gpio_write(GPIO_PIN(PA, 27), 0);
+        gpio_write(BRIZIO_LED_PIN, 0);
         xtimer_usleep(250000);
     }
 #endif
@@ -783,11 +698,11 @@ int main(void)
     //
     gpio_init(GPIO_PIN(PB, 22), GPIO_OUT);
     while (1) {
-        gpio_write(GPIO_PIN(PA, 27), 1);
+        gpio_write(BRIZIO_LED_PIN, 1);
         gpio_write(GPIO_PIN(PB, 22), 1);
         xtimer_usleep(500000);
         gpio_write(GPIO_PIN(PB, 22), 0);
-        gpio_write(GPIO_PIN(PA, 27), 0);
+        gpio_write(BRIZIO_LED_PIN, 0);
         xtimer_usleep(500000);
     }
 #endif
