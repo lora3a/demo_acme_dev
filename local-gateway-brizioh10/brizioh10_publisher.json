@@ -1,3 +1,3 @@
 {
-	"serial_port" : "/dev/ttyS1"
-	 }
+	"serial_port": "/dev/ttyS1"
+}
