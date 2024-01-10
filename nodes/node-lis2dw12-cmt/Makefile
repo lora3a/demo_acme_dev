@@ -1,0 +1,80 @@
+APPLICATION = node-lis2dw12-cmt
+BOARD ?= berta-h10
+
+BASE ?= $(CURDIR)/../../
+LORA3ABASE ?= $(BASE)/../lora3a-boards
+RIOTBASE ?= $(BASE)/../RIOT
+
+EXTERNAL_BOARD_DIRS=$(LORA3ABASE)/boards
+EXTERNAL_MODULE_DIRS+=$(LORA3ABASE)/modules
+EXTERNAL_MODULE_DIRS+=$(BASE)/shared_modules
+EXTERNAL_PKG_DIRS=$(LORA3ABASE)/pkg
+
+QUIET ?= 1
+PORT ?= /dev/ttyUSB0
+
+USEMODULE += fmt
+USEMODULE += periph_adc
+USEMODULE += periph_spi_reconfigure
+USEMODULE += periph_cpuid
+USEMODULE += printf_float
+USEMODULE += saml21_backup_mode
+USEMODULE += acme_lora
+USEMODULE += xtimer
+USEMODULE += nodes_data
+USEMODULE += h10_adc
+
+# LIS2DW12
+USEMODULE += lis2dw12
+
+ACME_PORT ?= 2
+
+ifeq ($(ACME_PORT), 0)
+CFLAGS += -DACME0_BUS_MODE=MODE_I2C
+CFLAGS += -DLIS2DW12_I2C_DEV=ACME0_I2C_DEV
+CFLAGS += -DLIS2DW12_POWER_PIN=ACME0_POWER_PIN
+endif
+
+ifeq ($(ACME_PORT), 1)
+CFLAGS += -DACME1_BUS_MODE=MODE_I2C
+CFLAGS += -DLIS2DW12_I2C_DEV=ACME1_I2C_DEV
+CFLAGS += -DLIS2DW12_POWER_PIN=ACME1_POWER_PIN
+endif
+
+ifeq ($(ACME_PORT), 2)
+CFLAGS += -DACME2_BUS_MODE=MODE_I2C
+CFLAGS += -DLIS2DW12_I2C_DEV=ACME2_I2C_DEV
+CFLAGS += -DLIS2DW12_POWER_PIN=ACME2_POWER_PIN
+endif
+
+
+BW ?= 2
+CH ?= 868100000L
+
+ifneq ($(BW),)
+	CFLAGS+=-DDEFAULT_LORA_BANDWIDTH=$(BW)
+endif
+
+ifneq ($(SF),)
+	CFLAGS+=-DDEFAULT_LORA_SPREADING_FACTOR=$(SF)
+endif
+
+ifneq ($(CR),)
+	CFLAGS+=-DDEFAULT_LORA_CODERATE=$(CR)
+endif
+
+ifneq ($(CH),)
+	CFLAGS+=-DDEFAULT_LORA_CHANNEL=$(CH)
+endif
+
+ifneq ($(PW),)
+	CFLAGS+=-DDEFAULT_LORA_POWER=$(PW)
+endif
+
+ifneq ($(BS),)
+	CFLAGS+=-DDEFAULT_LORA_BOOST=$(BS)
+endif
+
+
+include $(RIOTBASE)/Makefile.include
+include $(LORA3ABASE)/Makefile.include
