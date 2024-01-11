@@ -93,7 +93,7 @@ void ds18b20_sensor_read(void)
 
     gpio_clear(DS18_PWR_PIN);
 
-    printf("[SENSOR DS18B20] TEMP: %d\n", temperature);
+    printf("[SENSOR DS18B20] Temperature: %d °C\n", temperature);
 
     node_data.temperature = (int16_t)(temperature);
 }
@@ -156,14 +156,14 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[BOARD vcc] READ: %5d\n", node_data.header.vcc);
+    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
     //  Solar panel
     vpanel = h10_adc_read_vpanel(&h10_adc_dev);
     node_data.header.vpanel = (uint16_t)(vpanel);
-    printf("[BOARD vpanel] READ: %5d\n", node_data.header.vpanel);
+    printf("[BOARD vpanel] READ: %5d mV\n", node_data.header.vpanel);
 
     h10_adc_deinit(&h10_adc_dev);
 }

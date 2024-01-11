@@ -111,7 +111,7 @@ void lis2dw12_ds18b20_sensor_read(void)
     calculate_rotation(&rot_matrix, &acc, g_total);
 
     printf(
-        "[SENSOR Data] X: %.3f, Y: %.3f, Z: %.3f, TEMP: %.2f\n",
+        "[SENSOR Data] X: %.3f mg, Y: %.3f mg, Z: %.3f mg, Temperature: %.2f °C\n",
         acc.x_mg, acc.y_mg, acc.z_mg,
         acc.t_c);
 
@@ -140,7 +140,7 @@ void lis2dw12_ds18b20_sensor_read(void)
 
     gpio_clear(DS18_PWR_PIN);
 
-    printf("[DATA ds18b20] TEMP: %d\n", temperature);
+    printf("[SENSOR DS18B20] Temperature: %.2f °C\n", temperature / 100.);
 
     node_data.temp_ds18b20 = temperature;
 
@@ -209,14 +209,14 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[BOARD vcc] READ: %5d\n", node_data.header.vcc);
+    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
     //  Solar panel
     vpanel = h10_adc_read_vpanel(&h10_adc_dev);
     node_data.header.vpanel = (uint16_t)(vpanel);
-    printf("[BOARD vpanel] READ: %5d\n", node_data.header.vpanel);
+    printf("[BOARD vpanel] READ: %5d mV\n", node_data.header.vpanel);
 
     h10_adc_deinit(&h10_adc_dev);
 }

@@ -83,7 +83,7 @@ void hdc3020_sensor_read(void)
         puts("[SENSOR hdc3020] FAIL READ.");
         return;
     }
-    printf("[SENSOR Data] Temperature : %5.2f, Humidity : %6.2f\n", temp, hum);
+    printf("[SENSOR HDC3020] Temperature : %5.2f °C, Humidity : %6.2f %%\n", temp, hum);
     hdc3020_deinit(&hdc3020);
 
     node_data.temperature = (int16_t)(temp * 100.0);
@@ -144,14 +144,14 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("\n[BOARD vcc] READ: %5d\n", node_data.header.vcc);
+    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
     //  Solar panel
     vpanel = h10_adc_read_vpanel(&h10_adc_dev);
     node_data.header.vpanel = (uint16_t)(vpanel);
-    printf("[BOARD vpanel] READ: %5d\n", node_data.header.vpanel);
+    printf("[BOARD vpanel] READ: %5d mV\n", node_data.header.vpanel);
 
     h10_adc_deinit(&h10_adc_dev);
 }

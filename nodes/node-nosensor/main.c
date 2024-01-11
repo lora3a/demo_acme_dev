@@ -39,21 +39,25 @@ static node_nosensor node_data;
 
 static lora_state_t lora;
 
+//  Reads and fills node fields with board voltages
 void read_vcc_vpanel(void)
 {
+    int32_t vcc;
+    int32_t vpanel;
+
     h10_adc_init(&h10_adc_dev, &h10_adc_params[0]);
 
-    int32_t vcc = h10_adc_read_vcc(&h10_adc_dev);
-
+    //  Super Cap
+    vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[SENSOR vcc] READ: %5d\n", node_data.header.vcc);
+    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
-    int32_t vpanel = h10_adc_read_vpanel(&h10_adc_dev);
-
+    //  Solar panel
+    vpanel = h10_adc_read_vpanel(&h10_adc_dev);
     node_data.header.vpanel = (uint16_t)(vpanel);
-    printf("[SENSOR vpanel] READ: %5d\n", node_data.header.vpanel);
+    printf("[BOARD vpanel] READ: %5d mV\n", node_data.header.vpanel);
 
     h10_adc_deinit(&h10_adc_dev);
 }
