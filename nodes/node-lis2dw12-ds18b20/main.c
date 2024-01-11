@@ -209,7 +209,7 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
+    printf("\n[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
@@ -300,9 +300,6 @@ void transmit_packet(void)
 //  - Transmits packet
 void sensor_read(void)
 {
-    char payload_hex[NODE_PACKET_SIZE * 2 + 1];
-    char infomsg[200];
-
     //  Init lora parameters
     init_lora_setup();
 

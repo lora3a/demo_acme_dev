@@ -178,7 +178,7 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
+    printf("\n[BOARD vcc] READ: %5d mV\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 

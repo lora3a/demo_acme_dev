@@ -12,7 +12,11 @@ EXTERNAL_PKG_DIRS=$(LORA3ABASE)/pkg
 
 QUIET ?= 1
 PORT ?= /dev/ttyUSB0
-CFLAGS += -DACME_DEBUG=0
+
+ACME_DEBUG ?= 0
+ifneq ($(ACME_DEBUG),)
+	CFLAGS += -DACME_DEBUG=$(ACME_DEBUG)
+endif
 
 USEMODULE += fmt
 USEMODULE += periph_adc
