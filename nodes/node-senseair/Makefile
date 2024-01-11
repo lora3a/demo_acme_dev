@@ -23,6 +23,8 @@ USEMODULE += acme_lora
 USEMODULE += nodes_data
 USEMODULE += h10_adc
 
+CFLAGS += -DSLEEP_TIME=300
+
 # SENSEAIR + FRAM
 USEMODULE += senseair
 USEMODULE += fram

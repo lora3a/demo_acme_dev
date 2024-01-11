@@ -23,9 +23,11 @@ USEMODULE += acme_lora
 USEMODULE += nodes_data
 USEMODULE += h10_adc
 
+CFLAGS += -DSLEEP_TIME=300
+
 USEMODULE += bme680_i2c bme680_fp
 
-ACME_PORT ?= 0
+ACME_PORT ?= 1
 
 ifeq ($(ACME_PORT), 0)
 CFLAGS += -DACME0_BUS_MODE=MODE_I2C

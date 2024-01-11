@@ -26,7 +26,10 @@
       .polarity = EXTWAKE_HIGH, \
       .flags = EXTWAKE_IN_PU \
     }
+
+#ifndef SLEEP_TIME
 #define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
+#endif
 
 #define USES_FRAM               0
 

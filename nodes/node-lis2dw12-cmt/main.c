@@ -26,8 +26,10 @@
       .polarity = EXTWAKE_HIGH, \
       .flags = EXTWAKE_IN_PU \
     }
-#define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
 
+#ifndef SLEEP_TIME
+#define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
+#endif
 
 static saml21_extwake_t extwake = EXTWAKE;
 static lora_state_t lora;
