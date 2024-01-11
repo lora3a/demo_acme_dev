@@ -25,7 +25,7 @@
       .polarity = EXTWAKE_HIGH, \
       .flags = EXTWAKE_IN_PU \
     }
-#define SLEEP_TIME 10 /* in seconds; -1 to disable */
+#define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
 
 
 static saml21_extwake_t extwake = EXTWAKE;
@@ -75,7 +75,6 @@ void format_lis2dw12_ds18b20_info(int bln_hex, char *msg);
 //
 //  Read Sensor
 void (*sensor_read_ptr)(void) = &lis2dw12_ds18b20_sensor_read;
-;
 //  Format Sensor Data
 void (*format_info_ptr)(int, char *) = &format_lis2dw12_ds18b20_info;
 

@@ -23,7 +23,7 @@
         .pin = EXTWAKE_PIN6, \
         .polarity = EXTWAKE_HIGH, \
         .flags = EXTWAKE_IN_PU }
-#define SLEEP_TIME 10 /* in seconds; -1 to disable */
+#define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
 
 static saml21_extwake_t extwake = EXTWAKE;
 static h10_adc_t h10_adc_dev;
@@ -90,14 +90,14 @@ void hdc3020_sensor_read(void)
 void format_hdc3020_info(int bln_hex, char *msg)
 {
     if (bln_hex) {
-    sprintf(msg,
-        "TEMP: %05d, HUM: %05d\n",
-        node_data.temperature, node_data.humidity);
+        sprintf(msg,
+                "TEMP: %05d, HUM: %05d\n",
+                node_data.temperature, node_data.humidity);
     }
     else {
-    sprintf(msg,
-        "TEMP: %04X, HUM: %04X\n",
-        node_data.temperature, node_data.humidity);
+        sprintf(msg,
+                "TEMP: %04X, HUM: %04X\n",
+                node_data.temperature, node_data.humidity);
     }
 }
 

@@ -25,7 +25,7 @@
       .polarity = EXTWAKE_HIGH, \
       .flags = EXTWAKE_IN_PU \
     }
-#define SLEEP_TIME 10 /* in seconds; -1 to disable */
+#define SLEEP_TIME (5 * 60) /* in seconds; -1 to disable */
 
 
 static saml21_extwake_t extwake = EXTWAKE;
@@ -91,8 +91,8 @@ void ds18b20_sensor_read(void)
 
     gpio_clear(DS18_PWR_PIN);
 
-    printf("[SENSOR DATA] TEMP: %d\n",temperature);
- 
+    printf("[SENSOR DATA] TEMP: %d\n", temperature);
+
     node_data.temperature = (int16_t)(temperature);
 }
 
@@ -350,7 +350,7 @@ int main(void)
     }
 
     puts("Entering backup mode.");
-    
+
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;
