@@ -53,14 +53,14 @@ void read_vcc_vpanel(void)
     int32_t vcc = h10_adc_read_vcc(&h10_adc_dev);
 
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[SENSOR vcc] READ: %5d\n", node_data.header.vcc);
+    printf("\n[BOARD vcc] READ: %5d\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
     int32_t vpanel = h10_adc_read_vpanel(&h10_adc_dev);
 
     node_data.header.vpanel = (uint16_t)(vpanel);
-    printf("[SENSOR vpanel] READ: %5d\n", node_data.header.vpanel);
+    printf("[BOARD vpanel] READ: %5d\n", node_data.header.vpanel);
 
     h10_adc_deinit(&h10_adc_dev);
 }
@@ -124,8 +124,10 @@ void bme688_sensor_read(void)
 #endif
     _gas = (data.status & BME680_GASM_VALID_MSK) ? data.gas_resistance : 0;
 
-    printf("[DATA] TEMP: %.2f °C, PRESS: %d Pa, HUM: %.1f %%, GAS: %ld Ohm.\n",
-           _temp / 100., _press, _hum / 100., _gas);
+    printf(
+        "[SENSOR BME688] Temperature: %.2f °C, Pressure: %d Pa, Humidity: %.1f %%, Gas: %ld Ohm.\n",
+        _temp / 100., _press, _hum / 100., _gas);
+    puts("");
 
     node_data.temperature = _temp;
     node_data.humidity = _hum;
@@ -139,6 +141,8 @@ void bme688_sensor_read(void)
     fmt_bytes_hex(cpuid, node_data.header.cpuid, CPUID_LEN);
     cpuid[CPUID_LEN * 2] = 0;
 
+
+#if ACME_SLEEP
     char payload_hex[NODE_BME688_SIZE * 2 + 1];
 
     #define PAYLOAD_HEX_SIZE sizeof(payload_hex)
@@ -166,6 +170,7 @@ void bme688_sensor_read(void)
         );
 
     puts(payload_hex);
+#endif
 
     if (lora_init(&(lora)) != 0) {
         return;
@@ -245,7 +250,7 @@ int main(void)
         break;
     }
 
-    puts("Entering backup mode.");
+    puts("Entering backup mode.\n");
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;

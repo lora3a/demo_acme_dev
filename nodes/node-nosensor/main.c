@@ -89,6 +89,7 @@ void voltages_read(void)
     fmt_bytes_hex(cpuid, node_data.header.cpuid, CPUID_LEN);
     cpuid[CPUID_LEN * 2] = 0;
 
+#if ACME_DEBUG
     char payload_hex[NODE_NOSENSOR_SIZE * 2 + 1];
 
     #define PAYLOAD_HEX_SIZE sizeof(payload_hex)
@@ -112,7 +113,7 @@ void voltages_read(void)
         );
 
     puts(payload_hex);
-
+#endif
 
 
     if (lora_init(&(lora)) != 0) {
@@ -192,7 +193,7 @@ int main(void)
         break;
     }
 
-    puts("Entering backup mode.");
+    puts("Entering backup mode.\n");
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;

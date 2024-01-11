@@ -144,7 +144,7 @@ void read_vcc_vpanel(void)
     //  Super Cap
     vcc = h10_adc_read_vcc(&h10_adc_dev);
     node_data.header.vcc = (uint16_t)(vcc);
-    printf("[BOARD vcc] READ: %5d\n", node_data.header.vcc);
+    printf("\n[BOARD vcc] READ: %5d\n", node_data.header.vcc);
 
     ztimer_sleep(ZTIMER_USEC, 100);
 
@@ -235,8 +235,6 @@ void transmit_packet(void)
 //  - Transmits packet
 void sensor_read(void)
 {
-    char payload_hex[NODE_PACKET_SIZE * 2 + 1];
-    char infomsg[200];
 
     //  Init lora parameters
     init_lora_setup();
@@ -246,10 +244,13 @@ void sensor_read(void)
 
     //  Read data from sensor
     (*sensor_read_ptr)();
+    puts("");
 
     //  Switch off sensor
     gpio_clear(SENSOR_POWER_PIN);
 
+#if ACME_DEBUG
+    char infomsg[200];
     //  Report packet - info
     //  Header
     format_header_info(false, infomsg);
@@ -264,10 +265,13 @@ void sensor_read(void)
     (*format_info_ptr)(true, infomsg);
     printf("%s\n", infomsg);
 
+    char payload_hex[NODE_PACKET_SIZE * 2 + 1];
+
     //  Report packet binary - hex format
     fmt_bytes_hex(payload_hex, (uint8_t *)&node_data, NODE_PACKET_SIZE);
     payload_hex[NODE_PACKET_SIZE * 2] = 0;
     puts(payload_hex);
+#endif
 
     transmit_packet();
 }
@@ -332,7 +336,7 @@ int main(void)
         sensor_read();
         break;
     }
-    puts("Entering backup mode.");
+    puts("Entering backup mode.\n");
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;

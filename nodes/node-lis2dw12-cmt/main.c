@@ -322,7 +322,10 @@ void sensor_read(void)
 
     //  Read data from sensor
     (*sensor_read_ptr)();
+    puts("");
 
+#if ACME_DEBUG
+    char infomsg[200];
     //  Report packet - info
     //  Header
     format_header_info(false, infomsg);
@@ -337,10 +340,13 @@ void sensor_read(void)
     (*format_info_ptr)(true, infomsg);
     printf("%s\n", infomsg);
 
+    char payload_hex[NODE_PACKET_SIZE * 2 + 1];
+
     //  Report packet binary - hex format
     fmt_bytes_hex(payload_hex, (uint8_t *)&node_data, NODE_PACKET_SIZE);
     payload_hex[NODE_PACKET_SIZE * 2] = 0;
     puts(payload_hex);
+#endif
 
     transmit_packet();
 }
@@ -413,7 +419,7 @@ int main(void)
         break;
     }
 
-    puts("Entering backup mode.");
+    puts("Entering backup mode.\n");
     saml21_backup_mode_enter(0, extwake, SLEEP_TIME, 1);
     // never reached
     return 0;
