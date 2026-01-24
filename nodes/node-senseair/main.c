@@ -17,7 +17,7 @@
 #include "h10_adc_params.h"
 
 
-#define FW_VERSION "01.00.00"
+#define FW_VERSION "01.01.00"
 
 /* use { .pin=EXTWAKE_NONE } to disable */
 #define EXTWAKE \
@@ -93,6 +93,7 @@ void seaseair_sensor_read(void)
         return;
     }
 
+    puts("Reading SENSEAIR calibration data from FRAM.");
     memset(&abc_data, 0, sizeof(abc_data));
     if (fram_read(SENSEAIR_STATE_FRAM_ADDR, &abc_data, sizeof(abc_data))) {
         puts("[FRAM] read failed.");
@@ -320,12 +321,14 @@ void sensor_read(void)
 void wakeup_task(void)
 {
     puts("Wakeup task.");
+    fram_init();
     sensor_read();
 }
 
 void periodic_task(void)
 {
     puts("Periodic task.");
+    fram_init();
     sensor_read();
 }
 
@@ -336,7 +339,6 @@ void boot_task(void)
     puts("Boot task.");
     rtc_localtime(0, &time);
     rtc_set_time(&time);
-    fram_erase();
 }
 
 //  Main function
@@ -379,7 +381,6 @@ int main(void)
         if (SLEEP_TIME > -1) {
             printf("Periodic task running every %d seconds.\n", SLEEP_TIME);
         }
-        boot_task();
         report_lora_setup();
         sensor_read();
         break;
