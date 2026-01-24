@@ -13,7 +13,7 @@ EXTERNAL_PKG_DIRS=$(LORA3ABASE)/pkg
 QUIET ?= 1
 PORT ?= /dev/ttyUSB0
 
-ACME_DEBUG ?= 0
+ACME_DEBUG ?= 1
 ifneq ($(ACME_DEBUG),)
 	CFLAGS += -DACME_DEBUG=$(ACME_DEBUG)
 endif
@@ -29,7 +29,7 @@ USEMODULE += xtimer
 USEMODULE += nodes_data
 USEMODULE += h10_adc
 
-CFLAGS += -DSLEEP_TIME=300
+CFLAGS += -DSLEEP_TIME=30
 
 # LIS2DW12
 USEMODULE += lis2dw12
@@ -56,7 +56,9 @@ endif
 
 
 BW ?= 2
-CH ?= 868100000L
+CH ?= 869500000L
+SF ?= 7
+CR ?= 1
 
 ifneq ($(BW),)
 	CFLAGS+=-DDEFAULT_LORA_BANDWIDTH=$(BW)
